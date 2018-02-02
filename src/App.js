@@ -22,9 +22,6 @@ class App extends React.Component {
   render() {
     return (
       <Router>
-        {this.props.authSuccess && (
-          <Redirect to="/users/login/" />
-        )}
         <div className="App">
           <header className="App-header">
             <Link to="/">

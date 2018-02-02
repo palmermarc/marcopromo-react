@@ -1,17 +1,16 @@
 import React, { Component } from 'react';
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux';
-import { userLogOut } from '../../_actions/actions.authentication';
+import * as actions from '../../_actions/actions.authentication';
 
 
 class LogoutPage extends React.Component {
   constructor(props) {
     super(props);
-    sessionStorage.SessionName = "MarcoPromo";
-    sessionStorage.clear();
   }
 
   componentDidMount() {
-    this.props.logOut(true);
+    actions.userLogOut(true);
   }
 
   render() {
@@ -31,7 +30,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    logOut: (bool) => dispatch(userLogOut())
+    actions: bindActionCreators(actions, dispatch)
   };
 };
 
