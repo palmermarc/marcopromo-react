@@ -29,23 +29,17 @@ class LoginPage extends React.Component {
     const { username, password } = this.state;
     if (username && password) {
       this.props.authenticateUser('/users/authenticate', username, password);
-
-    }
-
-    if( sessionStorage.getItem('user') ) {
-      console.log('user is logged in');
+      this.forceUpdate();
     }
   }
 
   render() {
-
-    if (this.props.hasErrored) {
-      return <p>Something went wrong</p>;
-    }
-
     return (
       <div className="login_form">
         <h2>Login</h2>
+        {this.props.hasErrored &&
+        <h3 className="error">Invalid username or password</h3>
+        }
         <form name="form" onSubmit={this.handleSubmit}>
           <div className={'form-group' + (this.state.submitted && !this.state.username ? ' has-error' : '')}>
             <label htmlFor="username"><input size="35" required="true" type="text" className="form-control" name="username" placeholder="username" value={this.state.username} onChange={this.handleChange} /></label>
@@ -67,7 +61,7 @@ class LoginPage extends React.Component {
             }
           </div>
         </form>
-        {this.props.authSuccess && (
+        {sessionStorage.getItem('user') && (
           <Redirect to="/dashboard/" />
         )}
       </div>
@@ -86,7 +80,7 @@ const mapStateToProps = (state) => {
 
 const mapDispatchToProps = (dispatch) => {
   return {
-    authenticateUser: (url) => dispatch(authenticateUserInfo(url))
+    authenticateUser: (url, username, password) => dispatch(authenticateUserInfo(url, username, password))
   };
 };
 

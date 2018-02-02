@@ -166,3 +166,6 @@ ul.account-info li ul li a {
   display: block;
   padding: 10px 20px;
 }
+.error {
+  color: red;
+}

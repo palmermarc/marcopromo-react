@@ -10,7 +10,7 @@ export function authHasErrored(state = false, action) {
 export function authIsLoggingIn(state = false, action) {
   switch (action.type) {
     case 'IS_LOGGING_IN':
-      return action.isLoading;
+      return action.isLoggingIn;
     default:
       return state;
   }

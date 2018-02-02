@@ -28,16 +28,17 @@ export function authIsLoggedIn(bool) {
   }
 }
 
-export function authenticateUserInfo(url, username, password) {
+export function authenticateUserInfo(url, submittedUsername, submittedPassword) {
+
   return (dispatch) => {
     dispatch(authIsLoggingIn(true));
 
-    let loginInfo = {
-      username: username,
-      password: password
+    let loginData = {
+      username: submittedUsername,
+      password: submittedPassword
     };
 
-    axios.post('//marcopromo.api/' + url, loginInfo)
+    axios.post('//marcopromo.api' + url, loginData )
       .then((response) => {
 
         dispatch(authIsLoggingIn(false));
@@ -47,9 +48,10 @@ export function authenticateUserInfo(url, username, password) {
       .then((user) => {
         sessionStorage.setItem('user', user.data);
         dispatch(authSuccess(user.data));
+        dispatch(authIsLoggedIn(false));
       })
       .catch(() => {
-        dispatch(authIsLoggingIn(false));
+
         dispatch(authHasErrored(true));
       });
   }

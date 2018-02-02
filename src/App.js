@@ -1,7 +1,7 @@
 import React from 'react';
 //import ReactDOM from 'react-dom';
 import { BrowserRouter as Router, Route, Link } from 'react-router-dom'
-import { Redirect } from 'react-router'
+import { Redirect, withRouter } from 'react-router'
 import { connect } from 'react-redux';
 import logo from './assets/images/logo.svg';
 import Nav from './containers/template/Nav';
@@ -21,6 +21,7 @@ import LoginPage from './containers/users/login';
 class App extends React.Component {
   render() {
     return (
+
       <Router>
         <div className="App">
           <header className="App-header">
@@ -30,6 +31,7 @@ class App extends React.Component {
           </header>
           <Nav></Nav>
           <div id="content" className="container_bin">
+            {!this.props.isLoggedIn ? <Redirect to="/users/login/" /> : ''}
             <Route exact path="/" component={ItemList} />
             <Route exact path="/copy/" component={CopiesList} />
             <Route exact path="/copy/:copyid/" component={editCopy} />
@@ -37,10 +39,8 @@ class App extends React.Component {
             <Route exact path="/users/login/" component={LoginPage} />
           </div>
         </div>
-        {!this.props.isLoggedIn && (
-          <Redirect to="/users/login/" />
-        )}
       </Router>
+
     )
   }
 
