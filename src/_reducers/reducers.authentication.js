@@ -1,37 +1,17 @@
-export function authHasErrored(state = false, action) {
-  switch (action.type) {
-    case 'AUTH_HAS_ERRORED' :
-      return action.hasErrored;
-    default:
-      return state;
-  }
-}
+import initialState from '../_store/InitialState';
 
-export function authIsLoggingIn(state = false, action) {
-  switch (action.type) {
-    case 'IS_LOGGING_IN':
-      return action.isLoggingIn;
-    default:
-      return state;
-  }
-}
-
-export function authSuccess(state = [], action) {
+export function authUser(state = initialState, action) {
   switch (action.type) {
     case 'LOGIN_SUCCESS':
-      return action.user;
+      return {
+        isLoggedIn: action.isLoggedIn,
+        user: action.user
+      };
+    case 'LOGIN_HAS_ERRORS':
+      return {
+        hasErrors: action.hasErrors
+      }
     default:
       return state;
   }
 }
-
-export function authIsLoggedIn(state = false, action) {
-  switch (action.type) {
-    case 'IS_LOGGED_IN':
-      return action.isLoggedIn;
-    default:
-      return state;
-  }
-}
-
-

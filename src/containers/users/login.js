@@ -1,7 +1,8 @@
 import React from 'react';
 import { Redirect } from 'react-router'
+import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux';
-import { authenticateUserInfo } from '../../_actions/actions.authentication';
+import * as actions from '../../_actions/actions.authentication';
 
 class LoginPage extends React.Component {
   constructor(props) {
@@ -24,13 +25,12 @@ class LoginPage extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-
-    this.setState({ submitted: true });
-    const { username, password } = this.state;
+    this.setState({submitted: true});
+    const {username, password} = this.state;
     if (username && password) {
-      this.props.authenticateUser('/users/authenticate', username, password);
-      this.forceUpdate();
+      actions.authenticateUser(username, password);
     }
+    console.log(this.props);
   }
 
   render() {
@@ -61,9 +61,6 @@ class LoginPage extends React.Component {
             }
           </div>
         </form>
-        {sessionStorage.getItem('user') && (
-          <Redirect to="/dashboard/" />
-        )}
       </div>
     );
   }
@@ -71,17 +68,17 @@ class LoginPage extends React.Component {
 
 const mapStateToProps = (state) => {
   return {
-    user: state.user,
-    hasErrored: state.authHasErrored,
-    IsLoggingIn: state.authIsLoggingIn,
-    authSuccess: state.authSuccess
+    hasErrored: state.authUser,
+    IsLoggingIn: state.authUser.authIsLoggingIn,
+    user: state.authUser.authSuccess,
+    isLoggedIn: state.authUser.isLoggedIn
   };
 };
 
-const mapDispatchToProps = (dispatch) => {
+function mapDispatchToProps(dispatch) {
   return {
-    authenticateUser: (url, username, password) => dispatch(authenticateUserInfo(url, username, password))
+    actions: bindActionCreators(actions, dispatch)
   };
-};
+}
 
 export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
