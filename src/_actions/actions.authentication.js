@@ -58,6 +58,5 @@ export function authenticateUserInfo(url, username, password) {
 export function userLogOut() {
   return (dispatch) => {
     dispatch(authIsLoggedIn(false));
-    sessionStorage.clear();
   }
 }

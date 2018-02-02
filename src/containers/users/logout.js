@@ -11,6 +11,7 @@ class LogoutPage extends React.Component {
 
   componentDidMount() {
     actions.userLogOut(true);
+    sessionStorage.clear();
   }
 
   render() {

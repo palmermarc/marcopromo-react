@@ -37,12 +37,13 @@ class App extends React.Component {
             <Route exact path="/users/login/" component={LoginPage} />
           </div>
         </div>
+        {!this.props.isLoggedIn && (
+          <Redirect to="/users/login/" />
+        )}
       </Router>
     )
   }
 
-  /*<Route exact path="/users/editProfile/" component={EditSelf} />*/
-  /*<Route exact path="/users/edit/:user" component={EditUser} />*/
 }
 
 const mapStateToProps = (state) => {
