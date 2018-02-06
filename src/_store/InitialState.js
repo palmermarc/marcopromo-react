@@ -1,7 +1,9 @@
 export default {
-  isLoggedIn: false,
-  token: null,
-  loginError: '',
-  username: null,
-  userId: 0,
+  user : {
+    isLoggedIn: false,
+    token: null,
+    userId: null,
+    firstName: null,
+    lastName: null
+  }
 };

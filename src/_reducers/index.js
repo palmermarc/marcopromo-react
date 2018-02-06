@@ -1,7 +1,7 @@
 import { combineReducers } from 'redux';
 import { items, itemsHasErrored, itemsIsLoading } from './reducers.items';
 import { copies, copiesHasErrored, copiesIsLoading, copy, copyHasErrored, copyIsLoading } from './reducers.copies';
-import { authUser } from './reducers.authentication';
+import { user } from './reducers.authentication';
 
 export default combineReducers({
   items,
@@ -13,5 +13,5 @@ export default combineReducers({
   copy,
   copyHasErrored,
   copyIsLoading,
-  authUser
+  user
 });

@@ -1,0 +1,25 @@
+#navSidebar-menu {
+  width: 160px;
+  background-color: #ababab;
+  border-right: 3px solid #FDB913;
+  padding: 20px 10px 0;
+  height: 100vh;
+}
+
+#navSidebar ul {
+  list-style-type: none;
+  margin: 25px 0 0;
+  padding: 0;
+}
+#navSidebar img {
+  height: auto;
+  width: 100%;
+}
+#navSidebar ul li a {
+  display: block;
+  color: #ffffff;
+  font-size: 15px;
+  padding: 5px 0;
+  text-align: left;
+  text-decoration: none;
+}

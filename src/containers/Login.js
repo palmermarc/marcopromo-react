@@ -2,9 +2,9 @@ import React from 'react';
 import { Redirect } from 'react-router'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux';
-import * as actions from '../../_actions/actions.authentication';
+import * as actions from '../_actions/actions.authentication';
 
-class LoginPage extends React.Component {
+class Login extends React.Component {
   constructor(props) {
     super(props);
 
@@ -29,7 +29,7 @@ class LoginPage extends React.Component {
     this.setState({submitted: true});
     const {username, password} = this.state;
     if (username && password) {
-      actions.authenticateUser(username, password);
+      this.props.actions.authenticateUser(username, password);
     }
     console.log(this.props);
   }
@@ -60,6 +60,9 @@ class LoginPage extends React.Component {
             <button className="btn btn-primary">Login</button>
           </div>
         </form>
+        {this.props.user.userId &&
+        <Redirect to="/dashboard/" />
+        }
       </div>
     );
   }
@@ -75,4 +78,4 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default connect(mapStateToProps, mapDispatchToProps)(LoginPage);
+export default connect(mapStateToProps, mapDispatchToProps)(Login);
