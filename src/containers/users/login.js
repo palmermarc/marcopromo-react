@@ -25,6 +25,7 @@ class LoginPage extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
+    console.log('Made it this far');
     this.setState({submitted: true});
     const {username, password} = this.state;
     if (username && password) {
@@ -34,6 +35,7 @@ class LoginPage extends React.Component {
   }
 
   render() {
+
     return (
       <div className="login_form">
         <h2>Login</h2>
@@ -49,16 +51,13 @@ class LoginPage extends React.Component {
             }
           </div>
           <div className={'form-group' + (this.state.submitted && !this.state.password ? ' has-error' : '')}>
-            <label htmlFor="password"><input size="35" required="true" type="password" className="form-control" name="password" placeholder="password" value={this.state.password} onChange={this.handleChange} /></label>
+            <label htmlFor="password"><input size="35" required="true" type="text" className="form-control" name="password" placeholder="password" value={this.state.password} onChange={this.handleChange} /></label>
             {this.state.submitted && !this.state.password &&
             <div className="help-block">Password is required</div>
             }
           </div>
           <div className="form-group">
             <button className="btn btn-primary">Login</button>
-            {this.props.isLoggingIn &&
-            <img src="data:image/gif;base64,R0lGODlhEAAQAPIAAP///wAAAMLCwkJCQgAAAGJiYoKCgpKSkiH/C05FVFNDQVBFMi4wAwEAAAAh/hpDcmVhdGVkIHdpdGggYWpheGxvYWQuaW5mbwAh+QQJCgAAACwAAAAAEAAQAAADMwi63P4wyklrE2MIOggZnAdOmGYJRbExwroUmcG2LmDEwnHQLVsYOd2mBzkYDAdKa+dIAAAh+QQJCgAAACwAAAAAEAAQAAADNAi63P5OjCEgG4QMu7DmikRxQlFUYDEZIGBMRVsaqHwctXXf7WEYB4Ag1xjihkMZsiUkKhIAIfkECQoAAAAsAAAAABAAEAAAAzYIujIjK8pByJDMlFYvBoVjHA70GU7xSUJhmKtwHPAKzLO9HMaoKwJZ7Rf8AYPDDzKpZBqfvwQAIfkECQoAAAAsAAAAABAAEAAAAzMIumIlK8oyhpHsnFZfhYumCYUhDAQxRIdhHBGqRoKw0R8DYlJd8z0fMDgsGo/IpHI5TAAAIfkECQoAAAAsAAAAABAAEAAAAzIIunInK0rnZBTwGPNMgQwmdsNgXGJUlIWEuR5oWUIpz8pAEAMe6TwfwyYsGo/IpFKSAAAh+QQJCgAAACwAAAAAEAAQAAADMwi6IMKQORfjdOe82p4wGccc4CEuQradylesojEMBgsUc2G7sDX3lQGBMLAJibufbSlKAAAh+QQJCgAAACwAAAAAEAAQAAADMgi63P7wCRHZnFVdmgHu2nFwlWCI3WGc3TSWhUFGxTAUkGCbtgENBMJAEJsxgMLWzpEAACH5BAkKAAAALAAAAAAQABAAAAMyCLrc/jDKSatlQtScKdceCAjDII7HcQ4EMTCpyrCuUBjCYRgHVtqlAiB1YhiCnlsRkAAAOwAAAAAAAAAAAA==" />
-            }
           </div>
         </form>
       </div>
@@ -67,12 +66,7 @@ class LoginPage extends React.Component {
 }
 
 const mapStateToProps = (state) => {
-  return {
-    hasErrored: state.authUser,
-    IsLoggingIn: state.authUser.authIsLoggingIn,
-    user: state.authUser.authSuccess,
-    isLoggedIn: state.authUser.isLoggedIn
-  };
+  return state;
 };
 
 function mapDispatchToProps(dispatch) {

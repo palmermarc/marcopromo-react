@@ -2,15 +2,21 @@ import initialState from '../_store/InitialState';
 
 export function authUser(state = initialState, action) {
   switch (action.type) {
-    case 'LOGIN_SUCCESS':
-      return {
-        isLoggedIn: action.isLoggedIn,
-        user: action.user
-      };
+    case 'LOGOUT':
+      return Object.assign({}, state, {
+        isLoggedIn: false,
+        user: []
+      });
     case 'LOGIN_HAS_ERRORS':
-      return {
-        hasErrors: action.hasErrors
-      }
+      return Object.assign({}, state, {
+        isLoggedIn: false,
+        loginError: action.error
+      });
+    case 'LOGIN':
+      return Object.assign({}, state, {
+        isLoggedIn: true,
+        userId: action.userId
+      });
     default:
       return state;
   }

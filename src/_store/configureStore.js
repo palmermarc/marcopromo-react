@@ -2,10 +2,14 @@ import { createStore, applyMiddleware } from 'redux';
 import thunk from 'redux-thunk';
 import rootReducer from '../_reducers';
 
-export default function configureStore(initialState) {
+let storeInitialState = {
+  authUser: {}
+};
+
+export default function configureStore() {
   return createStore(
     rootReducer,
-    initialState,
+    storeInitialState,
     applyMiddleware(thunk)
   )
 }
