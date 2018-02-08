@@ -4,8 +4,10 @@ import { connect } from 'react-redux';
 import Nav from './containers/Nav';
 import createBrowserHistory from 'history/createBrowserHistory';
 import Login from './containers/Login';
-import CopiesList from './copies';
+import CopiesList from './containers/Copies';
+import EditCopy from './containers/EditCopy';
 import ItemList from './items.js';
+import CreateCopy from './containers/CreateCopy';
 import editCopy from './editCopy';
 
 import LogoutPage from './containers/users/logout';
@@ -19,12 +21,15 @@ class App extends React.Component {
       <Router history={history}>
         <div className="App">
           <Nav></Nav>
-          <div className="content">
-            <Route exact path="/" component={ItemList} />
-            <Route exact path="copy/" component={CopiesList} />
-            <Route exact path="copy/:copyid/" component={editCopy} />
-            <Route exact path="user/logout/" component={LogoutPage} />
-            <Route exact path="user/login/" component={Login} />
+          <div id="content" className="content">
+            <div id="content_bin">
+              <Route exact path="/" component={CopiesList} />
+              <Route exact path="/copy/" niceName="Copies" component={CopiesList} />
+              <Route exact path="/copy/create/" component={CreateCopy} />
+              <Route exact path="/copy/edit/:copyid/" component={EditCopy} />
+              <Route exact path="/user/logout/" component={LogoutPage} />
+              <Route exact path="/user/login/" component={Login} />
+            </div>
           </div>
         </div>
       </Router>

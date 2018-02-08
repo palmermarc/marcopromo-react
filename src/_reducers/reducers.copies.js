@@ -1,52 +1,23 @@
-export function copiesHasErrored(state = false, action) {
-  switch (action.type) {
-    case 'COPIES_HAS_ERRORED' :
-      return action.hasErrored;
-    default:
-      return state;
-  }
-}
+import initialState from '../store/InitialState';
 
-export function copiesIsLoading(state = false, action) {
-  switch (action.type) {
-    case 'COPIES_IS_LOADING':
-      return action.isLoading;
-    default:
-      return state;
-  }
-}
+export function copies(state = initialState, action) {
 
-export function copies(state = [], action) {
-  switch (action.type) {
-    case 'COPIES_FETCH_DATA_SUCCESS':
-      return action.copies;
-    default:
-      return state;
-  }
-}
+  let newState = Object.assign({}, state);
 
-export function copyHasErrored(state = false, action) {
   switch (action.type) {
-    case 'COPY_HAS_ERRORED' :
-      return action.copyHasErrored;
-    default:
-      return state;
-  }
-}
-
-export function copyIsLoading(state = false, action) {
-  switch (action.type) {
-    case 'COPY_IS_LOADING':
-      return action.copyIsLoading;
-    default:
-      return state;
-  }
-}
-
-export function copy(state = [], action) {
-  switch (action.type) {
-    case 'COPY_FETCH_DATA_SUCCESS':
-      return action.copy;
+    case 'copies':
+      newState.copies = action.copies;
+      console.log(newState);
+      return newState;
+    case 'COPIES_HAS_ERRORS':
+      newState.isLoggedIn = false;
+      newState.loginError = action.error;
+      console.log(newState);
+      return newState;
+    case 'COPIES_ARE_LOADING':
+      newState.copies = null;
+      newState.areLoading = true;
+      return newState;
     default:
       return state;
   }

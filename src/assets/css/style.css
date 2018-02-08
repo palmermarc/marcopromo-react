@@ -91,7 +91,11 @@ body {
   color: white;
 }
 #content {
-  margin-top: 2em;
+  padding: 2em 4em;
+  margin-left: 163px;
+}
+#content_bin {
+  padding: 2em 0;
 }
 .App-title {
   font-size: 1.5em;

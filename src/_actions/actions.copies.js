@@ -1,41 +1,38 @@
 import axios from 'axios';
 
-export function copiesHasErrored(bool) {
+function copiesIsLoading(bool) {
   return {
-    type: 'COPIES_HAS_ERRORED',
-    hasErrored: bool
-  };
-}
-
-export function copiesIsLoading(bool) {
-  return{
-    type: 'COPIES_IS_LOADING',
+    type: 'COPIES_ARE_LOADING',
     isLoading: bool
   }
 }
 
-export function copiesFetchDataSuccess(copies) {
-  return{
-    type: 'COPIES_FETCH_DATA_SUCCESS',
+function copiesHasErrored(message) {
+  return {
+    type: 'COPY_HAS_ERRORED',
+    message: message
+  }
+};
+
+export function copies(copies) {
+  return {
+    type: 'COPIES',
     copies: copies
   }
 }
 
-export function copiesFetchData( url ) {
+export function getAllCopies(page = 0) {
   return (dispatch) => {
-    dispatch (copiesIsLoading(true));
-
-    axios.get(url)
+    dispatch(copiesIsLoading(true));
+    axios.get('//marcopromo.api/copies/?paged='+page)
       .then((response) => {
+        dispatch(copies(response.data));
+      }).catch((e) => {
+        let response = JSON.parse(e.response.request.response);
+        dispatch(copiesHasErrored(response.message));
+      });
 
-        dispatch(copiesIsLoading(false));
-        console.log(response.data);
-        return response.data;
-      })
-      .then((copies) => {
-        dispatch(copiesFetchDataSuccess(copies))
-      })
-      .catch(() => dispatch(copiesHasErrored(true)));
+    dispatch(copiesIsLoading(false));
   }
 }
 

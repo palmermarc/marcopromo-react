@@ -1,4 +1,4 @@
-import initialState from '../_store/InitialState';
+import initialState from '../store/InitialState';
 
 export function user(state = initialState, action) {
 

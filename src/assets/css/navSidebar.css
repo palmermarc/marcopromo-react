@@ -1,6 +1,11 @@
+#navSidebar {
+  float: left;
+  width: 160px;
+  z-index: 9990;
+}
 #navSidebar-menu {
   width: 160px;
-  background-color: #ababab;
+  background-color: #e5e5e5;
   border-right: 3px solid #FDB913;
   padding: 20px 10px 0;
   height: 100vh;
@@ -17,7 +22,7 @@
 }
 #navSidebar ul li a {
   display: block;
-  color: #ffffff;
+  color: #000;
   font-size: 15px;
   padding: 5px 0;
   text-align: left;
