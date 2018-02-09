@@ -1,6 +1,7 @@
 #navSidebar {
   float: left;
   width: 160px;
+  position: fixed;
   z-index: 9990;
 }
 #navSidebar-menu {

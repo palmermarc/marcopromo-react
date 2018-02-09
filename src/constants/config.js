@@ -24,52 +24,54 @@ const config = {
   },
   fields: {
     copies : {
-      "name" : {
+      name : {
         "type" : "text",
         "label" : "Copy Name",
         "required" : false,
         "placeholder" : "Enter the Copy Name"
       },
-      "content" : {
+      content : {
         "type" : "wysiwyg",
         "label" : "Content",
         "required" : true,
         "placeholder" : "Copy Goes Here"
       },
-      "instructions" : {
+      instructions : {
         "type" : "wysiwyg",
         "label" : "Content",
         "required" : false,
         "placeholder" : "Enter any on-air instructions here..."
       },
-      "start_date" : {
+      start_date : {
         "type" : "date",
         "label" : "Start Date",
         "required" : true,
         "placeholder" : "",
       },
-      "end_date" : {
+      end_date : {
         "type" : "date",
-        "label" : "Start Date",
+        "label" : "End Date",
         "required" : true,
         "placeholder" : "",
       },
-      "station" : {
-        "type" : "date",
+      station : {
+        "type" : "select",
         "label" : "Station",
+        "placeholder" : "Select a Station...",
         "required" : true,
-        "options" : {
+        options : {
           "1" : "Station 1",
           "2" : "Station 2",
           "3" : "Station 3",
           "4" : "Station 4",
         }
       },
-      "copy_type" : {
-        "type" : "date",
-        "label" : "Station",
+      copy_type : {
+        "type" : "select",
+        "label" : "Copy Type",
+        "placeholder" : "Select a Copy Type...",
         "required" : true,
-        "options" : {
+        options : {
           "1" : "Copy Type 1",
           "2" : "Copy Type 2",
           "3" : "Copy Type 3",

@@ -4,12 +4,12 @@ import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import '../assets/css/tables.css';
 import PropTypes from 'prop-types';
-import { Dimmer, Loader, Table, Button, Label, Dropdown, Input, Icon, Menu } from 'semantic-ui-react';
+import { Table, Loader, Button, Label, Dropdown, Input, Icon, Menu } from 'semantic-ui-react';
 import MarcoPromo from '../core/MarcoPromo';
 import {throttle, renderFieldValue, empty} from '../utils/helpers';
 
 
-class CopiesList extends React.Component {
+class ListenersList extends React.Component {
 
   constructor(props, context) {
     super(props, context);
@@ -28,28 +28,36 @@ class CopiesList extends React.Component {
     return {
       currentFilters: {},
       currentPage: 1,
-      copies: [],
+      listeners: [],
       totalCount: 0,
       totalPages: 1,
       loading: true,
-      niceName: 'Copies'
+      niceName: 'Listeners',
+      searchFields : [
+        {key: 'first_name', text: 'First Name', value : 'first_name'},
+        {key: 'last_name', text: 'Last Name', value : 'last_name'},
+        {key: 'city', text: 'City', value : 'city'},
+        {key: 'city', text: 'Zip', value : 'zip'},
+        {key: 'primary_phone', text: 'Phone Number', value : 'primary_phone'},
+        {key: 'email', text: 'Email Address', value : 'email'},
+      ]
     }
   }
 
   componentWillMount() {
     // Call API
-    this.getRecords();
+    this.getListeners();
   }
 
   componentDidMount() {
-    document.title =  'MarcoPromo | Copy List';
+    document.title =  'MarcoPromo | Listener List';
   }
 
   componentWillReceiveProps(nextProps) {
 
     if (nextProps.route.type !== this.props.route.type) {
-      document.title = 'MarcoPromo | Copy List';
-      this.setState(this.getInitialState(), this.getRecords);
+      document.title = 'MarcoPromo | Listener List';
+      this.setState(this.getInitialState(), this.getListeners);
     }
   }
 
@@ -58,7 +66,7 @@ class CopiesList extends React.Component {
       {
         currentFilters: []
       },
-      this.getRecords
+      this.getListeners
     );
   }
 
@@ -68,7 +76,7 @@ class CopiesList extends React.Component {
         currentFilters: [],
         currentPage: this.state.currentPage > 1 ? this.state.currentPage - 1: this.state.currentPage
       },
-      this.getRecords
+      this.getListeners
     );
   }
 
@@ -78,7 +86,7 @@ class CopiesList extends React.Component {
         currentFilters: [],
         currentPage: this.state.currentPage < this.state.totalPages ? this.state.currentPage + 1: this.state.currentPage
       },
-      this.getRecords
+      this.getListeners
     );
   }
 
@@ -88,7 +96,7 @@ class CopiesList extends React.Component {
         currentPage: page,
         loading: true
       },
-      this.getRecords
+      this.getListeners
     );
   }
 
@@ -102,7 +110,7 @@ class CopiesList extends React.Component {
       currentFilters['status'] = value;
     }
 
-    this.setState({currentFilters: currentFilters}, this.getRecords);
+    this.setState({currentFilters: currentFilters}, this.getListeners);
   }
 
   filterMarket(e, {value}) {
@@ -115,11 +123,11 @@ class CopiesList extends React.Component {
       currentFilters['market'] = value;
     }
 
-    this.setState({currentFilters: currentFilters}, this.getRecords);
+    this.setState({currentFilters: currentFilters}, this.getListeners);
   }
 
   filterSearch(value) {
-    this.setState({currentFilters: {"search": value}}, this.getRecords);
+    this.setState({currentFilters: {"search": value}}, this.getListeners);
   }
 
   search(e) {
@@ -130,33 +138,33 @@ class CopiesList extends React.Component {
     }, 500, this.timer);
   }
 
-  getRecords() {
+  getListeners() {
     let self = this;
     MarcoPromo.get(
-      'copies',
+      'listeners',
       this.state.currentFilters,
       function(response) {
         if (response.data.success === true) {
 
           self.setState({
-            copies: response.data.results,
+            listeners: response.data.results,
             totalCount: response.data.totalCount,
             totalPages: Math.ceil(response.data.totalCount / 15),
             loading: false
           });
 
         } else {
-          MarcoPromo.error("Error getting records from MarcoPromo API server.");
+          MarcoPromo.error("Error getting listeners from MarcoPromo API server.");
         }
       }
       ,function (err) {
-        MarcoPromo.error("Error getting records from MarcoPromo API server: " + err);
+        MarcoPromo.error("Error getting listeners from MarcoPromo API server: " + err);
       }
     );
   }
 
   componentDidMount() {
-    document.title =  'MarcoPromo / Copies';
+    document.title =  'MarcoPromo / Listeners';
 
   }
 
@@ -166,49 +174,47 @@ class CopiesList extends React.Component {
 
     let {filterStatus, filterMarket, search} = this;
 
-    if(this.state.loading)
-      return (
-        <Dimmer active inverted><Loader inverted content='Loading Copies' size="massive" /></Dimmer>
-      )
-
     return (
       <div className="wrap fade-in">
         <div id="view-header-section">
           <h1 className="view-title">{this.state.niceName}</h1>
-          <Button as={Link} to={'/copy/create'} className="view-create-new">
+          <Button as={Link} to={'/listener/create/'} className="view-create-new">
             <Icon name="plus" />
             Create New
           </Button>
 
           <div className="view-filters">
-
           </div>
 
           <div className="view-search">
-            <Input placeholder={"Search " + this.state.niceName  + '...'} onKeyUp={search} />
+            <Input icon='users' iconPosition='left' placeholder={"Search " + this.state.niceName  + '...'} onKeyUp={search} label={<Dropdown defaultValue='last_name' options={this.state.searchFields} />} labelPosition={"right"} />
           </div>
         </div>
 
-        <Table celled selectable>
+        <Table singleLine selectable>
           <Table.Header>
             <Table.Row>
-              <Table.HeaderCell>Name</Table.HeaderCell>
-              <Table.HeaderCell>Station</Table.HeaderCell>
-              <Table.HeaderCell>Start Date</Table.HeaderCell>
-              <Table.HeaderCell>End Date</Table.HeaderCell>
-              <Table.HeaderCell>Copy Type</Table.HeaderCell>
+              <Table.HeaderCell>First Name</Table.HeaderCell>
+              <Table.HeaderCell>Last Name</Table.HeaderCell>
+              <Table.HeaderCell>City</Table.HeaderCell>
+              <Table.HeaderCell>State</Table.HeaderCell>
+              <Table.HeaderCell>Zip</Table.HeaderCell>
+              <Table.HeaderCell>Primary #</Table.HeaderCell>
+              <Table.HeaderCell>Secondary #</Table.HeaderCell>
+              <Table.HeaderCell>Email</Table.HeaderCell>
             </Table.Row>
           </Table.Header>
           <Table.Body>
-          {this.state.copies.map((copy) => (
+          {this.state.listeners.map((listener) => (
             <Table.Row>
-              <Table.Cell>
-                <Link to={'/copy/edit/' + copy.ID + '/'}>{copy.name}</Link>
-                </Table.Cell>
-              <Table.Cell>{copy.station.name}</Table.Cell>
-              <Table.Cell>{copy.state_date}</Table.Cell>
-              <Table.Cell>{copy.end_date}</Table.Cell>
-              <Table.Cell>{copy.type}</Table.Cell>
+              <Table.Cell><Link to={'/listeners/edit/' + listener.ID + '/'}>{listener.first_name}</Link></Table.Cell>
+              <Table.Cell><Link to={"/listeners/edit/" + listener.ID + "/"}>{listener.last_name}</Link></Table.Cell>
+              <Table.Cell><Link to={"/listeners/edit/" + listener.ID + "/"}>{listener.city}</Link></Table.Cell>
+              <Table.Cell><Link to={"/listeners/edit/" + listener.ID + "/"}>{listener.state}</Link></Table.Cell>
+              <Table.Cell><Link to={"/listeners/edit/" + listener.ID + "/"}>{listener.zip}</Link></Table.Cell>
+              <Table.Cell><Link to={"/listeners/edit/" + listener.ID + "/"}>{listener.primary_phone}</Link></Table.Cell>
+              <Table.Cell><Link to={"/listeners/edit/" + listener.ID + "/"}>{listener.secondary_phone}</Link></Table.Cell>
+              <Table.Cell><Link to={"/listeners/edit/" + listener.ID + "/"}>{listener.email}</Link></Table.Cell>
             </Table.Row>
           ))}
           </Table.Body>
@@ -229,4 +235,4 @@ function mapDispatchToProps(dispatch) {
 export default withRouter(connect(
   mapStateToProps,
   mapDispatchToProps
-)(CopiesList));
+)(ListenersList));

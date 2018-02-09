@@ -122,3 +122,23 @@ input#title {
 .error {
   color: red;
 }
+
+
+
+/****************
+  INPUT STYLING
+****************/
+.ui.form {
+  margin-top: 4em;
+}
+.ui.form .fields .field,
+.ui.form .field {
+  clear: none;
+}
+.ui.input,
+.ui.form input[type=checkbox],
+.ui.button,
+.ui.selection.dropdown,
+.ui.form textarea {
+  margin-bottom: 1em;
+}

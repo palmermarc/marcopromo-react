@@ -85,10 +85,11 @@ class MarcoPromo {
               "Endpoint" : endpoint,
               "Method" : "POST",
               "Data" : data,
+              "Error" : err.response
             }
           );
         }
-        return false;
+        r(false);
       });
     });
 
@@ -111,7 +112,7 @@ class MarcoPromo {
 
   event(action, data = '', target = null, user = null) {
 
-    this.log(action, data, target, user);
+    //this.log(action, data, target, user);
     this.sendMail(action, data, target, user);
   }
 

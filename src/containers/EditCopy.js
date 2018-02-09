@@ -1,5 +1,6 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import '../assets/css/tables.css';
 import PropTypes from 'prop-types';
@@ -113,7 +114,7 @@ function mapDispatchToProps(dispatch) {
   return {};
 }
 
-export default connect(
+export default withRouter(connect(
   mapStateToProps,
   mapDispatchToProps
-)(EditCopy);
+)(EditCopy));

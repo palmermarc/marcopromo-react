@@ -25,6 +25,41 @@ class Nav extends React.Component {
     return (
 
         <div id="navSidebar">
+            <div id="navSidebar-menu">
+              <header>
+                <Link to="/">
+                  <img className="App-logo" src={logo} alt="Hubbard Interactive"/>
+                </Link>
+              </header>
+              <nav>
+                <ul className="navigation">
+                  <li><NavLink activeStyle={activeStyling} to="/copy/">Copy</NavLink></li>
+                  <li><NavLink activeStyle={activeStyling} to="/contests/">Contests</NavLink></li>
+                  <li><NavLink activeStyle={activeStyling} to="/listeners/">Listeners</NavLink></li>
+                  <li><NavLink activeStyle={activeStyling} to="/frontdesk/">Front Desk</NavLink></li>
+                </ul>
+              </nav>
+            </div>
+        </div>
+    );
+  }
+}
+
+const mapStateToProps = (state) => {
+  return {
+    isLoggedIn: state.user.isLoggedIn,
+    /*username: state.main.username,
+    userPhoto: state.main.userPhoto,
+    sidebarNavActive: state.main.sidebarNavActive,
+    errors: state.main.errors,
+    notification: state.main.notification*/
+  };
+};
+
+export default connect(mapStateToProps)(Nav);
+
+/*
+<div id="navSidebar">
           {this.props.isLoggedIn ?
             <div id="navSidebar-menu">
               <header>
@@ -56,19 +91,4 @@ class Nav extends React.Component {
             </div>
           }
         </div>
-    );
-  }
-}
-
-const mapStateToProps = (state) => {
-  return {
-    isLoggedIn: state.user.isLoggedIn,
-    /*username: state.main.username,
-    userPhoto: state.main.userPhoto,
-    sidebarNavActive: state.main.sidebarNavActive,
-    errors: state.main.errors,
-    notification: state.main.notification*/
-  };
-};
-
-export default connect(mapStateToProps)(Nav);
+ */
