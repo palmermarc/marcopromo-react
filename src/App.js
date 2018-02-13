@@ -1,5 +1,5 @@
 import React from 'react';
-import { Router, Route, Link } from 'react-router-dom'
+import { Router, Route } from 'react-router-dom'
 import { connect } from 'react-redux';
 import Nav from './containers/Nav';
 import createBrowserHistory from 'history/createBrowserHistory';
@@ -26,7 +26,7 @@ class App extends React.Component {
               <Route exact path="/" component={CopiesList} />
               <Route exact path="/copy/" niceName="Copies" component={CopiesList} />
               <Route exact path="/copy/create/" component={CreateCopy} />
-              <Route exact path="/copy/edit/:copyid/" component={EditCopy} />
+              <Route exact path="/copy/edit/:copyId/" component={EditCopy} />
               <Route exact path="/user/logout/" component={LogoutPage} />
               <Route exact path="/user/login/" component={Login} />
               <Route exact path="/listeners/" component={ListenersList} />

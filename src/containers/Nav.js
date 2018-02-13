@@ -19,7 +19,7 @@ class Nav extends React.Component {
   render() {
 
     let activeStyling = {
-      "font-weight" : "bold"
+      "fontWeight" : "bold"
     };
 
     return (

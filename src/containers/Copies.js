@@ -3,10 +3,9 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import '../assets/css/tables.css';
-import PropTypes from 'prop-types';
-import { Dimmer, Loader, Table, Button, Label, Dropdown, Input, Icon, Menu } from 'semantic-ui-react';
+import { Menu,Dimmer, Loader, Table, Button, Input, Icon } from 'semantic-ui-react';
 import MarcoPromo from '../core/MarcoPromo';
-import {throttle, renderFieldValue, empty} from '../utils/helpers';
+import {throttle} from '../utils/helpers';
 
 
 class CopiesList extends React.Component {
@@ -38,7 +37,7 @@ class CopiesList extends React.Component {
 
   componentWillMount() {
     // Call API
-    this.getRecords();
+    this.getCopies();
   }
 
   componentDidMount() {
@@ -46,11 +45,7 @@ class CopiesList extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-
-    if (nextProps.route.type !== this.props.route.type) {
-      document.title = 'MarcoPromo | Copy List';
-      this.setState(this.getInitialState(), this.getRecords);
-    }
+    this.setState(this.getInitialState(), this.getCopies);
   }
 
   clearFilters() {
@@ -58,27 +53,27 @@ class CopiesList extends React.Component {
       {
         currentFilters: []
       },
-      this.getRecords
+      this.getCopies
     );
   }
 
   prevPage() {
     this.setState(
       {
-        currentFilters: [],
+        currentFilters: { "page" : this.state.currentPage > 1 ? this.state.currentPage - 1: this.state.currentPage },
         currentPage: this.state.currentPage > 1 ? this.state.currentPage - 1: this.state.currentPage
       },
-      this.getRecords
+      this.getCopies
     );
   }
 
   nextPage() {
     this.setState(
       {
-        currentFilters: [],
+        currentFilters: { "page": this.state.currentPage < this.state.totalPages ? this.state.currentPage + 1: this.state.currentPage},
         currentPage: this.state.currentPage < this.state.totalPages ? this.state.currentPage + 1: this.state.currentPage
       },
-      this.getRecords
+      this.getCopies
     );
   }
 
@@ -86,9 +81,10 @@ class CopiesList extends React.Component {
     this.setState(
       {
         currentPage: page,
+        currentFilters: { "page": page },
         loading: true
       },
-      this.getRecords
+      this.getCopies
     );
   }
 
@@ -102,7 +98,7 @@ class CopiesList extends React.Component {
       currentFilters['status'] = value;
     }
 
-    this.setState({currentFilters: currentFilters}, this.getRecords);
+    this.setState({currentFilters: currentFilters}, this.getCopies);
   }
 
   filterMarket(e, {value}) {
@@ -115,11 +111,11 @@ class CopiesList extends React.Component {
       currentFilters['market'] = value;
     }
 
-    this.setState({currentFilters: currentFilters}, this.getRecords);
+    this.setState({currentFilters: currentFilters}, this.getCopies);
   }
 
   filterSearch(value) {
-    this.setState({currentFilters: {"search": value}}, this.getRecords);
+    this.setState({currentFilters: {"search": value}}, this.getCopies);
   }
 
   search(e) {
@@ -130,7 +126,7 @@ class CopiesList extends React.Component {
     }, 500, this.timer);
   }
 
-  getRecords() {
+  getCopies() {
     let self = this;
     MarcoPromo.get(
       'copies',
@@ -141,7 +137,7 @@ class CopiesList extends React.Component {
           self.setState({
             copies: response.data.results,
             totalCount: response.data.totalCount,
-            totalPages: Math.ceil(response.data.totalCount / 15),
+            totalPages: Math.ceil(response.data.totalCount / 100),
             loading: false
           });
 
@@ -153,11 +149,6 @@ class CopiesList extends React.Component {
         MarcoPromo.error("Error getting records from MarcoPromo API server: " + err);
       }
     );
-  }
-
-  componentDidMount() {
-    document.title =  'MarcoPromo / Copies';
-
   }
 
   render() {
@@ -201,17 +192,109 @@ class CopiesList extends React.Component {
           </Table.Header>
           <Table.Body>
           {this.state.copies.map((copy) => (
-            <Table.Row>
+            <Table.Row key={'copy-'+copy.ID}>
               <Table.Cell>
                 <Link to={'/copy/edit/' + copy.ID + '/'}>{copy.name}</Link>
                 </Table.Cell>
               <Table.Cell>{copy.station.name}</Table.Cell>
-              <Table.Cell>{copy.state_date}</Table.Cell>
+              <Table.Cell>{copy.start_date}</Table.Cell>
               <Table.Cell>{copy.end_date}</Table.Cell>
               <Table.Cell>{copy.type}</Table.Cell>
             </Table.Row>
           ))}
           </Table.Body>
+          <Table.Footer>
+            <Table.Row>
+              <Table.HeaderCell colSpan="6" className="view-pagination">
+                <Menu pagination>
+
+                  { this.state.currentPage > 1 ?
+                    <Menu.Item icon onClick={this.prevPage}>
+                      <Icon name="chevron left" />
+                    </Menu.Item>
+                    :
+                    <Menu.Item icon disabled>
+                      <Icon name="chevron left" />
+                    </Menu.Item>
+                  }
+
+                  { this.state.currentPage > 3 ?
+                    <Menu.Item name ="1" onClick={() => this.jumpToPage(1)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage > 4 ?
+                    <Menu.Item disabled>...</Menu.Item>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage > 2 ?
+                    <Menu.Item name={String(this.state.currentPage - 2)} onClick={() => this.jumpToPage(this.state.currentPage - 2)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage > 1 ?
+                    <Menu.Item name={String(this.state.currentPage - 1)} onClick={() => this.jumpToPage(this.state.currentPage - 1)}/>
+                    :
+                    null
+                  }
+
+                  <Menu.Item name={String(this.state.currentPage)} active={true} onClick={() => this.jumpToPage(this.state.currentPage)} />
+
+                  { this.state.currentPage < this.state.totalPages - 1 ?
+                    <Menu.Item name={String(this.state.currentPage + 1)} onClick={() => this.jumpToPage(this.state.currentPage + 1)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage < this.state.totalPages - 2 ?
+                    <Menu.Item name={String(this.state.currentPage + 2)} onClick={() => this.jumpToPage(this.state.currentPage + 2)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage <= 2 && this.state.currentPage < this.state.totalPages -  3 ?
+                    <Menu.Item name={String(this.state.currentPage + 3)} onClick={() => this.jumpToPage(this.state.currentPage + 3)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage <= 1 && this.state.currentPage < this.state.totalPages -  4 ?
+                    <Menu.Item name={String(this.state.currentPage + 4)} onClick={() => this.jumpToPage(this.state.currentPage + 4)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage < this.state.totalPages - 4 ?
+                    <Menu.Item disabled>...</Menu.Item>
+                    :
+                    null
+                  }
+
+
+                  { this.state.currentPage < this.state.totalPages - 3 ?
+                    <Menu.Item name={String(this.state.totalPages)} onClick={() => this.jumpToPage(this.state.totalPages)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage !== this.state.totalPages?
+                    <Menu.Item icon onClick={this.nextPage}>
+                      <Icon name="chevron right" />
+                    </Menu.Item>
+                    :
+                    <Menu.Item icon disabled>
+                      <Icon name="chevron right" />
+                    </Menu.Item>
+                  }
+
+                </Menu>
+              </Table.HeaderCell>
+            </Table.Row>
+          </Table.Footer>
         </Table>
       </div>
     );

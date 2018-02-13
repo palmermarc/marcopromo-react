@@ -96,6 +96,48 @@ class MarcoPromo {
     return result;
   }
 
+  put( endpoint, data, callback, error ) {
+
+    let self = this;
+
+
+    let url = this.config.apiBase + endpoint;
+    let config = {
+      //headers: {"X-Flagship-Token" : localStorage.getItem("flagshipToken")},
+      ...data
+    };
+
+    let result = new Promise(resolve => {
+      let r = resolve;
+      axios.put(url,config).then( function(response) {
+
+        if (typeof callback === "function") {
+          callback(response);
+        }
+        r(true);
+      }).catch( function(err) {
+
+        if (typeof error === "function") {
+          error(err);
+        } else {
+          self.log(
+            "error",
+            {
+              "Description": "API Error",
+              "Endpoint" : endpoint,
+              "Method" : "POST",
+              "Data" : data,
+              "Error" : err.response
+            }
+          );
+        }
+        r(false);
+      });
+    });
+
+    return result;
+  }
+
   log(action, data = '', target = null, user = null) {
 
     let logData = {
