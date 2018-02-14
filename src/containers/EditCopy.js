@@ -1,13 +1,9 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router'
-import { Link } from 'react-router-dom'
 import '../assets/css/style.css';
-import PropTypes from 'prop-types';
-import { List, Message, Divider, Dropdown, Breadcrumb, Header, Form, Button, Transition, Radio, Input, Select, TextArea } from 'semantic-ui-react';
+import { Icon, Loader, Dimmer, Message, Divider, Dropdown, Breadcrumb, Header, Form, Button, Transition, Radio, Input, TextArea } from 'semantic-ui-react';
 import MarcoPromo from '../core/MarcoPromo';
-import config from '../constants/config';
-
 
 class EditCopy extends React.Component {
 
@@ -35,6 +31,7 @@ class EditCopy extends React.Component {
       end_date: '',
       station_id: 0,
       success: false,
+      successMessage: '',
       errors: {},
       hasError: false,
       stations: [],
@@ -93,22 +90,22 @@ class EditCopy extends React.Component {
       schedule: this.state.copySchedule
     };
 
+    let self = this;
+
     MarcoPromo.put(
       'copies/' + this.state.copyId,
       data,
       function(response) {
         if (response.data.success === true) {
-          console.log('It worked!');
-          this.setState( { success: true, hasError: false, successMessage: response.data.message } );
+          self.setState( { success: true, hasError: false, successMessage: response.data.message } );
 
         } else {
-          this.setState({hasError: true, success: false});
+          self.setState({hasError: true, success: false});
           MarcoPromo.error("Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.");
         }
       }
       ,function (err) {
-        //self.setState({ errors: err.response.data.errors, hasError: true });
-        console.log(err);
+        self.setState({ errors: err.response.data.errors, hasError: true });
         MarcoPromo.error("Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.");
       }
     );
@@ -128,7 +125,6 @@ class EditCopy extends React.Component {
 
   getCopy(ID) {
     let self = this;
-    let copy = [];
     MarcoPromo.get(
       'copies/'+ID,
       {},
@@ -143,8 +139,13 @@ class EditCopy extends React.Component {
             end_date: copy.end_date,
             type: copy.type,
             station_id: copy.station.ID,
-            schedule: copy.schedule
+            copySchedule: copy.schedules,
+            loading: false
           });
+
+          if(copy.schedules.length) {
+            self.setState({ visible: true });
+          }
         };
       }
     );
@@ -197,7 +198,12 @@ class EditCopy extends React.Component {
     const { visible } = this.state;
     let errors = this.state.errors;
     let error_keys = Object.keys(errors);
-    console.log(this.state.copySchedule);
+
+    if(this.state.loading)
+      return (
+        <Dimmer active inverted><Loader inverted content='Loading Copy Data' size="massive" /></Dimmer>
+      )
+
     return (
       <div className="wrap fade-in">
         <div id="view-header-section">
@@ -245,7 +251,11 @@ class EditCopy extends React.Component {
             </Form.Group>
 
             <Form.Field>
-              <Radio toggle onChange={this.toggleScheduleCopy} name="scheduling_copy" label="Schedule the copy" />
+              {visible === true ?
+                <Radio defaultChecked toggle onChange={this.toggleScheduleCopy} label="Schedule the copy"  />
+              :
+                <Radio toggle onChange={this.toggleScheduleCopy} label="Schedule the copy" />
+              }
             </Form.Field>
 
 
@@ -254,24 +264,24 @@ class EditCopy extends React.Component {
                 {this.state.copySchedule.map((schedule, idx) => (
                   <div>
                     <Form.Group className={"repeatable_form_group"}inline>
-                      <Form.Field onChange={this.handleCopyScheduleChange(idx, 'date')} control={Input} type="date" icon="calendar"/>
-                      <Form.Field onChange={this.handleCopyScheduleChange(idx, 'time')} control={Input} type="time" icon="clock" />
+                      <Form.Field onChange={this.handleCopyScheduleChange(idx, 'date')} control={Input} type="date" icon="calendar" value={schedule.date} />
+                      <Form.Field onChange={this.handleCopyScheduleChange(idx, 'time')} control={Input} type="time" icon="clock" value={schedule.time} />
                       <button type="button" onClick={this.handleRemoveShareholder(idx)} className="small">-</button>
                     </Form.Group>
                   </div>
                 ))}
 
-                <Form.Field control={Button} onClick={this.handleAddCopySchedule} className="small">Add CopySchedule</Form.Field>
+                <Form.Field control={Button} onClick={this.handleAddCopySchedule} className="small"><Icon name={"plus"} /> Add Another Schedule</Form.Field>
               </div>
             </Transition >
 
-            {this.state.success &&
+            {this.state.success === true &&
             <Message positive>
               <Message.Header>{this.state.successMessage}</Message.Header>
             </Message>
             }
 
-            {this.state.hasError &&
+            {this.state.hasError === true &&
             <Message negative>
               <Message.Header>Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.</Message.Header>
               <Message.List items={this.getErrorArray(errors)}></Message.List>

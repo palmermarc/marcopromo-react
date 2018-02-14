@@ -3,10 +3,9 @@ import { connect } from 'react-redux';
 import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
 import '../assets/css/tables.css';
-import PropTypes from 'prop-types';
-import { Table, Loader, Button, Label, Dropdown, Input, Icon, Menu } from 'semantic-ui-react';
+import { Dimmer, Table, Loader, Button, Label, Dropdown, Input, Icon, Menu } from 'semantic-ui-react';
 import MarcoPromo from '../core/MarcoPromo';
-import {throttle, renderFieldValue, empty} from '../utils/helpers';
+import { throttle } from '../utils/helpers';
 
 
 class ListenersList extends React.Component {
@@ -20,6 +19,7 @@ class ListenersList extends React.Component {
     this.filterStatus = this.filterStatus.bind(this);
     this.filterMarket = this.filterMarket.bind(this);
     this.filterSearch = this.filterSearch.bind(this);
+    this.setSearchObject = this.setSearchObject.bind(this);
     this.search = this.search.bind(this);
     this.timer = null;
   }
@@ -37,10 +37,11 @@ class ListenersList extends React.Component {
         {key: 'first_name', text: 'First Name', value : 'first_name'},
         {key: 'last_name', text: 'Last Name', value : 'last_name'},
         {key: 'city', text: 'City', value : 'city'},
-        {key: 'city', text: 'Zip', value : 'zip'},
+        {key: 'zip', text: 'Zip', value : 'zip'},
         {key: 'primary_phone', text: 'Phone Number', value : 'primary_phone'},
         {key: 'email', text: 'Email Address', value : 'email'},
-      ]
+      ],
+      searchField: ''
     }
   }
 
@@ -100,6 +101,10 @@ class ListenersList extends React.Component {
     );
   }
 
+  setSearchObject(e, {value}) {
+    this.setState({searchField: value});
+  }
+
   filterStatus(e, {value}) {
     let currentFilters = Object.assign({}, this.state.currentFilters);
 
@@ -127,7 +132,7 @@ class ListenersList extends React.Component {
   }
 
   filterSearch(value) {
-    this.setState({currentFilters: {"search": value}}, this.getListeners);
+    this.setState({currentFilters: {[this.state.searchField]: value}}, this.getListeners);
   }
 
   search(e) {
@@ -149,7 +154,7 @@ class ListenersList extends React.Component {
           self.setState({
             listeners: response.data.results,
             totalCount: response.data.totalCount,
-            totalPages: Math.ceil(response.data.totalCount / 15),
+            totalPages: Math.ceil(response.data.totalCount / 100),
             loading: false
           });
 
@@ -169,16 +174,23 @@ class ListenersList extends React.Component {
   }
 
   render() {
-    console.log(this.props);
+    console.log(this.state);
     let currentFilters = this.state.currentFilters;
 
     let {filterStatus, filterMarket, search} = this;
+
+    if(this.state.loading)
+      return (
+        <Dimmer active inverted><Loader inverted content='Loading Member List' size="massive" /></Dimmer>
+      )
+
+    console.log(this.state);
 
     return (
       <div className="wrap fade-in">
         <div id="view-header-section">
           <h1 className="view-title">{this.state.niceName}</h1>
-          <Button as={Link} to={'/listener/create/'} className="view-create-new">
+          <Button as={Link} to={'/listeners/create/'} className="view-create-new">
             <Icon name="plus" />
             Create New
           </Button>
@@ -187,7 +199,7 @@ class ListenersList extends React.Component {
           </div>
 
           <div className="view-search">
-            <Input icon='users' iconPosition='left' placeholder={"Search " + this.state.niceName  + '...'} onKeyUp={search} label={<Dropdown defaultValue='last_name' options={this.state.searchFields} />} labelPosition={"right"} />
+            <Input icon='users' iconPosition='left' placeholder={"Search " + this.state.niceName  + '...'} onKeyUp={search} label={<Dropdown defaultValue='last_name' onChange={this.setSearchObject} options={this.state.searchFields} />} labelPosition={"right"} />
           </div>
         </div>
 
@@ -206,7 +218,7 @@ class ListenersList extends React.Component {
           </Table.Header>
           <Table.Body>
           {this.state.listeners.map((listener) => (
-            <Table.Row>
+            <Table.Row key={'listener-' + listener.ID}>
               <Table.Cell><Link to={'/listeners/edit/' + listener.ID + '/'}>{listener.first_name}</Link></Table.Cell>
               <Table.Cell><Link to={"/listeners/edit/" + listener.ID + "/"}>{listener.last_name}</Link></Table.Cell>
               <Table.Cell><Link to={"/listeners/edit/" + listener.ID + "/"}>{listener.city}</Link></Table.Cell>
@@ -218,6 +230,98 @@ class ListenersList extends React.Component {
             </Table.Row>
           ))}
           </Table.Body>
+          <Table.Footer>
+            <Table.Row>
+              <Table.HeaderCell colSpan="8" className="view-pagination">
+                <Menu pagination>
+
+                  { this.state.currentPage > 1 ?
+                    <Menu.Item icon onClick={this.prevPage}>
+                      <Icon name="chevron left" />
+                    </Menu.Item>
+                    :
+                    <Menu.Item icon disabled>
+                      <Icon name="chevron left" />
+                    </Menu.Item>
+                  }
+
+                  { this.state.currentPage > 3 ?
+                    <Menu.Item name ="1" onClick={() => this.jumpToPage(1)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage > 4 ?
+                    <Menu.Item disabled>...</Menu.Item>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage > 2 ?
+                    <Menu.Item name={String(this.state.currentPage - 2)} onClick={() => this.jumpToPage(this.state.currentPage - 2)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage > 1 ?
+                    <Menu.Item name={String(this.state.currentPage - 1)} onClick={() => this.jumpToPage(this.state.currentPage - 1)}/>
+                    :
+                    null
+                  }
+
+                  <Menu.Item name={String(this.state.currentPage)} active={true} onClick={() => this.jumpToPage(this.state.currentPage)} />
+
+                  { this.state.currentPage < this.state.totalPages - 1 ?
+                    <Menu.Item name={String(this.state.currentPage + 1)} onClick={() => this.jumpToPage(this.state.currentPage + 1)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage < this.state.totalPages - 2 ?
+                    <Menu.Item name={String(this.state.currentPage + 2)} onClick={() => this.jumpToPage(this.state.currentPage + 2)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage <= 2 && this.state.currentPage < this.state.totalPages -  3 ?
+                    <Menu.Item name={String(this.state.currentPage + 3)} onClick={() => this.jumpToPage(this.state.currentPage + 3)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage <= 1 && this.state.currentPage < this.state.totalPages -  4 ?
+                    <Menu.Item name={String(this.state.currentPage + 4)} onClick={() => this.jumpToPage(this.state.currentPage + 4)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage < this.state.totalPages - 4 ?
+                    <Menu.Item disabled>...</Menu.Item>
+                    :
+                    null
+                  }
+
+
+                  { this.state.currentPage < this.state.totalPages - 3 ?
+                    <Menu.Item name={String(this.state.totalPages)} onClick={() => this.jumpToPage(this.state.totalPages)}/>
+                    :
+                    null
+                  }
+
+                  { this.state.currentPage !== this.state.totalPages?
+                    <Menu.Item icon onClick={this.nextPage}>
+                      <Icon name="chevron right" />
+                    </Menu.Item>
+                    :
+                    <Menu.Item icon disabled>
+                      <Icon name="chevron right" />
+                    </Menu.Item>
+                  }
+
+                </Menu>
+              </Table.HeaderCell>
+            </Table.Row>
+          </Table.Footer>
         </Table>
       </div>
     );

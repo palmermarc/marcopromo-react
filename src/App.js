@@ -8,6 +8,7 @@ import CopiesList from './containers/Copies';
 import EditCopy from './containers/EditCopy';
 import CreateCopy from './containers/CreateCopy';
 import ListenersList from './containers/Listeners';
+import CreateListener from './containers/CreateListener';
 //import editCopy from './editCopy';
 
 import LogoutPage from './containers/users/logout';
@@ -30,6 +31,7 @@ class App extends React.Component {
               <Route exact path="/user/logout/" component={LogoutPage} />
               <Route exact path="/user/login/" component={Login} />
               <Route exact path="/listeners/" component={ListenersList} />
+              <Route exact path="/listeners/create/" component={CreateListener} />
             </div>
           </div>
         </div>
