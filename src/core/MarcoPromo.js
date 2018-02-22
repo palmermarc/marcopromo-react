@@ -1,6 +1,6 @@
 /*
  * flagship.js
- * Main Flagship frontend class to manage core functionality
+ * Main MarcoPromo frontend class to manage core functionality
  */
 
 import axios from 'axios';
@@ -20,7 +20,7 @@ class MarcoPromo {
 
     let url = this.config.apiBase + endpoint + ( query !== {} ? '?' + queryString.stringify(query) : '' );
     let config = {
-      //headers: {"X-Flagship-Token" : localStorage.getItem("flagshipToken")}
+      //headers: {"X-MarcoPromo-Token" : localStorage.getItem("marcoPromoToken")}
     };
     console.log(url);
 
@@ -57,11 +57,10 @@ class MarcoPromo {
   post( endpoint, data, callback, error ) {
 
     let self = this;
-
-
+    
     let url = this.config.apiBase + endpoint;
     let config = {
-      //headers: {"X-Flagship-Token" : localStorage.getItem("flagshipToken")},
+      //headers: {"X-MarcoPromo-Token" : localStorage.getItem("marcoPromoToken")},
       ...data
     };
 
@@ -103,7 +102,7 @@ class MarcoPromo {
 
     let url = this.config.apiBase + endpoint;
     let config = {
-      //headers: {"X-Flagship-Token" : localStorage.getItem("flagshipToken")},
+      //headers: {"X-MarcoPromo-Token" : localStorage.getItem("marcoPromoToken")},
       ...data
     };
 

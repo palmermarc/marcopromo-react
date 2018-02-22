@@ -14,15 +14,15 @@ export function user(state = initialState, action) {
       newState.email = null;
       newState.phone = null;
       newState.token = null;
-      console.log(newState);
       return newState;
     case 'LOGIN_HAS_ERRORS':
       newState.isLoggedIn = false;
-      newState.loginError = action.error;
-      console.log(newState);
+      newState.loginHasErrors = true;
+      newState.loginError = action.loginError;
       return newState;
     case 'LOGIN':
       newState.isLoggedIn = true;
+      newState.loginHasErrors = false;
       newState.userId = user.userId;
       newState.username = user.username;
       newState.first_name = user.first_name;

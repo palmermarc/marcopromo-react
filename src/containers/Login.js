@@ -3,6 +3,9 @@ import { Redirect } from 'react-router'
 import { bindActionCreators } from 'redux'
 import { connect } from 'react-redux';
 import * as actions from '../_actions/actions.authentication';
+import '../assets/css/Login.css';
+import logo from '../assets/images/logo.svg';
+import { Message, Form, Button, Input } from 'semantic-ui-react';
 
 class Login extends React.Component {
   constructor(props) {
@@ -14,7 +17,7 @@ class Login extends React.Component {
     this.state = {
       username: '',
       password: '',
-      submitted: false
+      submitted: false,
     }
   }
 
@@ -25,43 +28,36 @@ class Login extends React.Component {
 
   handleSubmit(e) {
     e.preventDefault();
-    console.log('Made it this far');
     this.setState({submitted: true});
     const {username, password} = this.state;
     if (username && password) {
       this.props.actions.authenticateUser(username, password);
     }
-    console.log(this.props);
   }
 
   render() {
+    let user = this.props.user;
 
     return (
       <div className="login_form">
-        <h2>Login</h2>
-        {this.props.hasErrored &&
-        <h3 className="error">Invalid username or password</h3>
+        <img className="App-logo" src={logo} alt="Hubbard Interactive"/>
+        {user.loginHasErrors &&
+        <Message error>{user.loginError}</Message>
         }
-        <form name="form" onSubmit={this.handleSubmit}>
-          <div className={'form-group' + (this.state.submitted && !this.state.username ? ' has-error' : '')}>
-            <label htmlFor="username"><input size="35" required="true" type="text" className="form-control" name="username" placeholder="username" value={this.state.username} onChange={this.handleChange} /></label>
 
-            {this.state.submitted && !this.state.username &&
-            <div className="help-block">Username is required</div>
-            }
-          </div>
-          <div className={'form-group' + (this.state.submitted && !this.state.password ? ' has-error' : '')}>
-            <label htmlFor="password"><input size="35" required="true" type="text" className="form-control" name="password" placeholder="password" value={this.state.password} onChange={this.handleChange} /></label>
-            {this.state.submitted && !this.state.password &&
-            <div className="help-block">Password is required</div>
-            }
-          </div>
-          <div className="form-group">
-            <button className="btn btn-primary">Login</button>
-          </div>
-        </form>
-        {this.props.user.userId &&
-        <Redirect to="/dashboard/" />
+        <Form onSubmit={this.handleSubmit}>
+          <Form.Field>
+            <Input type="text" name="username" value={this.state.username} onChange={this.handleChange} placeholder="username" />
+          </Form.Field>
+          <Form.Field>
+            <Input type="password" name="password" value={this.state.password} onChange={this.handleChange} placeholder="password" />
+          </Form.Field>
+
+          <Form.Field fluid control={Button}>Login</Form.Field>
+        </Form>
+
+        {user.isLoggedIn === true &&
+          <Redirect push to="/" />
         }
       </div>
     );

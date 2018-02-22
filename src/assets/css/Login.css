@@ -1,0 +1,64 @@
+.user-not-logged-in input {
+  background-color: transparent;
+  border-bottom: 1px solid #fff;
+}
+body .user-not-logged-in {
+  background: #000 url('http://nextgen.hubstllanding.wpengine.com/wp-content/uploads/sites/12/2016/06/production-board-darkened.jpg') no-repeat top center;
+  background-size: cover;
+  height: 100vh
+}
+.user-not-logged-in .App-logo {
+  height: auto;
+  width: 100%;
+}
+.user-not-logged-in #content {
+  margin-left: 0;
+}
+.user-not-logged-in #navSidebar {
+  display: none;
+}
+.user-not-logged-in .login_form {
+  margin: 50px auto;
+  max-width: 450px;
+  padding: 50px;
+  width: 100%;
+}
+.user-not-logged-in .login_form h2{
+  color: #FFFFFF;
+  margin-top: 0;
+  text-transform: uppercase;
+}
+.user-not-logged-in .login_form label {
+  display: block;
+  margin: 0 0 20px;
+}
+.user-not-logged-in .login_form .form-group.has-error label {
+  margin: 0;
+}
+.user-not-logged-in .login_form .form-group.has-error .help-block {
+  margin: 0 0 20px;
+}
+.user-not-logged-in .login_form .ui.form input[type=text],
+.user-not-logged-in .login_form .ui.form input[type=password] {
+  background-color: transparent;
+  border-bottom: 1px solid #FFF;
+  border-radius: 0;
+  color: #FFF;
+  padding: 3px;
+}
+
+.user-not-logged-in .ui.form .field {
+  margin-bottom: 2em;
+}
+
+.user-not-logged-in .ui.form .field .ui.button {
+  background: transparent;
+  color: #FFF;
+  border: 2px solid;
+}
+
+.user-not-logged-in  .ui.form .ui.input input:focus {
+  border-top: 0px none;
+  border-left: 0px;
+  border-right: 0px;
+}

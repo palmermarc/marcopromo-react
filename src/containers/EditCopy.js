@@ -11,25 +11,22 @@ class EditCopy extends React.Component {
     super(props, context);
     this.state = this.getInitialState();
     this.handleSubmit = this.handleSubmit.bind(this);
-    this.handleChange = this.handleChange.bind(this);
+    this.handleCopyChange = this.handleCopyChange.bind(this);
     this.toggleScheduleCopy = this.toggleScheduleCopy.bind(this);
     this.getStations = this.getStations.bind(this);
     this.getCopy = this.getCopy.bind(this);
+
+    this.updateCopy = this.updateCopy.bind(this);
+    this.createCopy = this.createCopy.bind(this);
   }
 
   getInitialState() {
     return {
       loading: true,
-      niceName: 'Edit Copy',
+      niceName: 'Create New Copy',
       visible: false,
       name: '',
       unsaved: false,
-      content: '',
-      instructions: '',
-      start_date: '',
-      type: '',
-      end_date: '',
-      station_id: 0,
       success: false,
       successMessage: '',
       errors: {},
@@ -41,21 +38,38 @@ class EditCopy extends React.Component {
         {key: 3,text:'Copy Type 3', value: 3},
         {key: 4,text:'Copy Type 4', value: 4},
       ],
-      copyId: this.props.match.params.copyId,
-      copySchedule: [
-        {date: '', time: ''}
-      ]
+      copy : {
+        name : '',
+        content : '',
+        instructions : '',
+        start_date : '',
+        end_date : '',
+        type : '',
+        station_id : 0,
+        schedule : [{
+          date: '',
+          time: '',
+        }],
+      },
+      copyId: 0,
     }
   }
 
   componentWillMount() {
     // Call API
-    this.getCopy(this.state.copyId);
+    if( this.state.copyId !== 0 )
+      this.getCopy(this.state.copyId);
+
     this.getStations();
   }
 
   componentDidMount() {
     document.title = this.state.niceName;
+    if( typeof this.props.match.params.copyId !== "undefined" ) {
+      this.getCopy(this.props.match.params.copyId);
+      this.setState({ copyId: this.props.match.params.copyId, niceName: "Update Copy" });
+    }
+    this.setState({loading: false});
   }
 
   componentWillReceiveProps(nextProps) {
@@ -66,10 +80,17 @@ class EditCopy extends React.Component {
     }
   }
 
-  handleChange(e) {
+  handleCopyChange(e) {
     const { name, value } = e.target;
-    this.setState({[name] : value });
-    this.setState({unsaved: true});
+    
+    this.setState(
+      prevState => ({
+        copy: {
+          ...prevState.copy,
+          [name]: value
+        },
+        unsaved: true
+      }));
   }
 
   handleSelectChange = (e, {name, value} ) => this.setState({[name]: value, unsaved: true})
@@ -78,17 +99,28 @@ class EditCopy extends React.Component {
     this.setState({ hasError: false, errors: {}, success: false });
     // Handle Validation
 
+    let copy = this.state.copy;
+
     // Send the data to the API
     let data = {
-      name: this.state.name,
-      content: this.state.content,
-      instructions: this.state.instructions,
-      start_date: this.state.start_date,
-      end_date: this.state.end_date,
-      type: this.state.type,
-      station_id: this.state.station_id,
-      schedule: this.state.copySchedule
+      name: copy.name,
+      content: copy.content,
+      instructions: copy.instructions,
+      start_date: copy.start_date,
+      end_date: copy.end_date,
+      type: copy.type,
+      station_id: copy.station_id,
+      schedule: copy.copySchedule
     };
+
+    if( this.state.copyId !== 0 ) {
+      this.updateCopy(data);
+    } else {
+      this.createCopy(data);
+    }
+  }
+
+  updateCopy(data) {
 
     let self = this;
 
@@ -96,13 +128,7 @@ class EditCopy extends React.Component {
       'copies/' + this.state.copyId,
       data,
       function(response) {
-        if (response.data.success === true) {
-          self.setState( { success: true, hasError: false, successMessage: response.data.message } );
-
-        } else {
-          self.setState({hasError: true, success: false});
-          MarcoPromo.error("Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.");
-        }
+        self.setState( { success: true, hasError: false, successMessage: response.data.message } );
       }
       ,function (err) {
         self.setState({ errors: err.response.data.errors, hasError: true });
@@ -111,12 +137,25 @@ class EditCopy extends React.Component {
     );
   }
 
-  getErrorArray(errors) {
-    let err = [];
-    Object.keys(errors).map((error) => {
-      err.push(errors[error]);
-    });
-    return err;
+  createCopy(data) {
+    let self = this;
+    MarcoPromo.post(
+      'copies',
+      data,
+      function(response) {
+        self.setState({
+          success: true,
+          successMessage: response.data.message
+        });
+      }
+      ,function (err) {
+        self.setState({ errors: err.response.data.errors, hasError: true });
+        console.log('---------------------------');
+        console.log(err.response.data.errors);
+        console.log('---------------------------');
+        //MarcoPromo.error("Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.");
+      }
+    );
   }
 
   toggleScheduleCopy() {
@@ -223,30 +262,30 @@ class EditCopy extends React.Component {
               <Input value={this.state.copyId} name="copyId" type="hidden" />
             </Form.Field>
 
-            <Form.Field required onChange={this.handleChange} name="name" control={Input} label="Copy Title" value={this.state.name} placeholder="Enter the Copy Title" />
-            <Form.Field value={this.state.content} required onChange={this.handleChange} name="content" control={TextArea} label="Copy Content" placeholder="Enter the Copy Content" />
+            <Form.Field required onChange={this.handleCopyChange} name="name" control={Input} label="Copy Title" value={this.state.copy.name} placeholder="Enter the Copy Title" />
+            <Form.Field value={this.state.copy.content} required onChange={this.handleCopyChange} name="content" control={TextArea} label="Copy Content" placeholder="Enter the Copy Content" />
 
-            <Form.Field value={this.state.instructions} onChange={this.handleChange} name="instructions" control={TextArea} label="Copy Instructions" placeholder="Enter the Copy Instructions" />
+            <Form.Field value={this.state.copy.instructions} onChange={this.handleCopyChange} name="instructions" control={TextArea} label="Copy Instructions" placeholder="Enter the Copy Instructions" />
 
             <Form.Group inline>
               <Form.Field>
-                <Input required value={this.state.start_date} onChange={this.handleChange} name="start_date" label={{color: "green", tag: false, content: "Start Date"}} type="date" icon="calendar" iconPosition="left" labelPosition="right" />
+                <Input required value={this.state.copy.start_date} onChange={this.handleCopyChange} name="start_date" label={{color: "green", tag: false, content: "Start Date"}} type="date" icon="calendar" iconPosition="left" labelPosition="right" />
                 {error_keys.hasOwnProperty('start_date') &&
                 <Message error content={errors.start_date}></Message>
                 }
               </Form.Field>
               <Form.Field>
-                <Input required value={this.state.end_date} onChange={this.handleChange} name="end_date" label={{color: "red", tag: false, content: "End Date"}} type="date" icon="calendar" iconPosition="left" labelPosition="right" />
+                <Input required value={this.state.copy.end_date} onChange={this.handleCopyChange} name="end_date" label={{color: "red", tag: false, content: "End Date"}} type="date" icon="calendar" iconPosition="left" labelPosition="right" />
               </Form.Field>
             </Form.Group>
 
             <Form.Group inline>
               <Form.Field>
-                <Form.Dropdown selection required onChange={this.handleSelectChange} name="station_id" placeholder="Select a Station..." options={this.state.stations} value={this.state.station_id} />
+                <Form.Dropdown selection required onChange={this.handleSelectChange} name="station_id" placeholder="Select a Station..." options={this.state.stations} value={this.state.copy.station_id} />
               </Form.Field>
 
               <Form.Field>
-                <Dropdown selection required onChange={this.handleSelectChange} name="type" placeholder="Select a Copy Type..." options={this.state.copyTypes} value={this.state.type} />
+                <Dropdown selection required onChange={this.handleSelectChange} name="type" placeholder="Select a Copy Type..." options={this.state.copyTypes} value={this.state.copy.type} />
               </Form.Field>
             </Form.Group>
 
@@ -261,8 +300,8 @@ class EditCopy extends React.Component {
 
             <Transition visible={visible} animation='fade' duration={500}>
               <div>
-                {this.state.copySchedule.map((schedule, idx) => (
-                  <div>
+                {this.state.copy.schedule.map((schedule, idx) => (
+                  <div key={"schedule-"+idx}>
                     <Form.Group className={"repeatable_form_group"}inline>
                       <Form.Field onChange={this.handleCopyScheduleChange(idx, 'date')} control={Input} type="date" icon="calendar" value={schedule.date} />
                       <Form.Field onChange={this.handleCopyScheduleChange(idx, 'time')} control={Input} type="time" icon="clock" value={schedule.time} />
@@ -281,14 +320,14 @@ class EditCopy extends React.Component {
             </Message>
             }
 
-            {this.state.hasError === true &&
+            {errors.length &&
             <Message negative>
               <Message.Header>Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.</Message.Header>
-              <Message.List items={this.getErrorArray(errors)}></Message.List>
+              <Message.List items={errors}></Message.List>
             </Message>
             }
 
-            <Form.Field control={Button}>Edit Copy</Form.Field>
+            <Form.Field control={Button}>{this.state.niceName}</Form.Field>
           </Form>
         </div>
       </div>

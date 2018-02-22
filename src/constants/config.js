@@ -79,7 +79,26 @@ const config = {
         }
       }
     }
-  }
+  },
+  dropdowns : {
+    prizes : {
+      'ignore30DayRule' : [
+        { value: 0, text: 'This prize does not ignore the 30 day rule' },
+        { value: 1, text: 'This prize ignores the 30 day rule' },
+      ],
+      'isPrizeInHouse' : [
+        { value: 0, text: 'We are still waiting to get the prize in house' },
+        { value: 1, text: 'We have the prize in house'}
+      ],
+      'listenerPickup' : [
+        {key: "Picked Up", text: "Picked Up", value: "picked_up"},
+        {text: "Mailed Out", value: "mailed_out"},
+        {text: "Guest Listed", value: "guest_list"},
+        {text: "Delivered", value: "delivered"},
+        {text: "Call Winner", value: "call_winner"}
+      ]
+    },
+  },
 }
 
 export default config;

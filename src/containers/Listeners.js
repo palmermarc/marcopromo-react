@@ -54,14 +54,6 @@ class ListenersList extends React.Component {
     document.title =  'MarcoPromo | Listener List';
   }
 
-  componentWillReceiveProps(nextProps) {
-
-    if (nextProps.route.type !== this.props.route.type) {
-      document.title = 'MarcoPromo | Listener List';
-      this.setState(this.getInitialState(), this.getListeners);
-    }
-  }
-
   clearFilters() {
     this.setState(
       {

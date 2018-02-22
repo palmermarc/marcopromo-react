@@ -2,6 +2,7 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { withRouter } from 'react-router'
 import { Link } from 'react-router-dom'
+
 import '../assets/css/tables.css';
 import { Menu,Dimmer, Loader, Table, Button, Input, Icon } from 'semantic-ui-react';
 import MarcoPromo from '../core/MarcoPromo';
@@ -9,6 +10,8 @@ import {throttle} from '../utils/helpers';
 
 
 class CopiesList extends React.Component {
+
+
 
   constructor(props, context) {
     super(props, context);
@@ -152,7 +155,6 @@ class CopiesList extends React.Component {
   }
 
   render() {
-    console.log(this.props);
     let currentFilters = this.state.currentFilters;
 
     let {filterStatus, filterMarket, search} = this;
@@ -302,7 +304,9 @@ class CopiesList extends React.Component {
 }
 
 function mapStateToProps(state) {
-  return {};
+  return {
+    isLoggedIn: state.user.isLoggedIn
+  };
 }
 
 function mapDispatchToProps(dispatch) {

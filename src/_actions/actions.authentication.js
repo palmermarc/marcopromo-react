@@ -28,6 +28,7 @@ export function authHasErrors(error) {
 }
 
 export function authenticateUser(username, password){
+  console.log('Made it to the function');
   let loginData = {
     username: username,
     password: password
@@ -43,10 +44,10 @@ export function authenticateUser(username, password){
       sessionStorage.setItem('last_name', response.data.last_name);
       sessionStorage.setItem('email', response.data.email);
       sessionStorage.setItem('phone', response.data.phone);
-      sessionStorage.setItem('token', response.data.token);
+      sessionStorage.setItem('marcoPromoToken', response.data.token);
     }).catch((e) => {
       let response = JSON.parse(e.response.request.response);
-      dispatch(authHasErrors(response.message));
+      dispatch(authHasErrors("Error: Wrong Username/Password"));
       sessionStorage.setItem('error', response.message);
     });
   }
@@ -59,12 +60,14 @@ export function userLogOut() {
     dispatch(authLogout());
   }
 }
-/*
-export function checkToken(token) {
 
-  return function (dispatch) {
+export function checkToken(token) {
+  console.log(token);
+  console.log(this.context.router);
+  /*return function (dispatch) {
     // thunk
-    let url = '//marcopromo.api/users/authenticate'+ 'validate-token';
+
+    let url = '//marcopromo.api/token/authenticate'
 
     axios.post(url, {token}).then(function (response) {
       if (response.data.success === true) {
@@ -82,96 +85,11 @@ export function checkToken(token) {
           userMarket: response.data.market
         });
       } else {
-        //browserHistory.push('/login');
-
-        return dispatch({
-          type: types.INVALID_TOKEN,
-          token: response.data.token
-        });
+        browserHistory.push('/login/');
       }
     }).catch(function() {
-      //browserHistory.push('/login');
+      browserHistory.push('/login');
     });
   };
+  */
 }
-
-/*import axios from 'axios';
-
-export function authHasErrored(bool) {
-  return {
-    type: 'AUTH_HAS_ERRORED',
-    hasErrored: bool
-  };
-}
-
-export function authIsLoggedIn(bool) {
-  return  {
-    type: 'IS_LOGGED_IN',
-    isLoggedIn: bool
-  }
-}
-
-export function authenticateUser(submittedUsername, submittedPassword) {
-
-  let loginData = {
-    username: submittedUsername,
-    password: submittedPassword
-  };
-
-  axios.post('//marcopromo.api/users/authenticate', loginData )
-    .then((response) => {
-      return response;
-    })
-    .then((user) => {
-      if (user.data.token != null) {
-        sessionStorage.setItem('user', user.data.id);
-        sessionStorage.setItem('token', user.data.token);
-        return (dispatch) => {
-          dispatch(authIsLoggedIn(true));
-        }
-      } else {
-        return (dispatch) => {
-          dispatch(authHasErrored(true));
-        }
-      }
-    })
-    .catch(() => {
-      return (dispatch) => {
-        dispatch(authHasErrored(true));
-      }
-    });
-}
-
-export function userLogOut() {
-  return (dispatch) => {
-    dispatch(authIsLoggedIn(false));
-  }
-}
-
-/**
- let loginData = {
-    username: submittedUsername,
-    password: submittedPassword
-  };
-
- console.log(loginData);
-
- return (dispatch) => {
-    dispatch(authIsLoggingIn(true));
-
-    axios.post('//marcopromo.api/users/authenticate', loginData )
-      .then((response) => {
-        return response;
-      })
-      .then((user) => {
-      console.log(user);
-        sessionStorage.setItem('user', user.data.id);
-        sessionStorage.setItem('token', user.data.token);
-        dispatch(authIsLoggedIn(true));
-        dispatch(authSuccess(true, user.data));
-      })
-      .catch(() => {
-        dispatch(authHasErrored(true));
-      });
-  }
- **/
