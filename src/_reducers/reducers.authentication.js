@@ -14,6 +14,7 @@ export function user(state = initialState, action) {
       newState.email = null;
       newState.phone = null;
       newState.token = null;
+      sessionStorage.clear();
       return newState;
     case 'LOGIN_HAS_ERRORS':
       newState.isLoggedIn = false;

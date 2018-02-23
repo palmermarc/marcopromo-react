@@ -4,15 +4,12 @@ import { withRouter } from 'react-router'
 import '../assets/css/style.css';
 import { Segment, Label, Message, Divider, Breadcrumb, Header, Form, Button, Input, Dropdown, Transition, Radio,  Select, TextArea } from 'semantic-ui-react';
 import MarcoPromo from '../core/MarcoPromo';
-import config from '../constants/config';
-
 
 class EditListener extends React.Component {
 
   constructor(props, context) {
     super(props, context);
     this.state = this.getInitialState();
-    this.handleSubmit = this.handleSubmit.bind(this);
     this.handleChange = this.handleChange.bind(this);
     this.getAge = this.getAge.bind(this);
     this.getListener = this.getListener.bind(this);
@@ -27,8 +24,8 @@ class EditListener extends React.Component {
       visible: false,
       success: false,
       successMessage: '',
-      errors: {},
-      hasError: false,
+      errors: [],
+      hasErrors: false,
       listenerId: 0,
       listener: {
         "first_name": '',
@@ -64,11 +61,8 @@ class EditListener extends React.Component {
   }
 
   componentWillReceiveProps(nextProps) {
-
-    if (nextProps.route.type !== this.props.route.type) {
-      document.title = this.state.niceName;
-      this.setState(this.getInitialState());
-    }
+    document.title = this.state.niceName;
+    this.setState(this.getInitialState());
   }
 
   handleChange(e) {
@@ -115,7 +109,7 @@ class EditListener extends React.Component {
         });
       },
       function(err) {
-        self.setState({ errors: err.response.data.errors, hasError: true });
+        self.setState({ errors: err.response.data.errors, hasErrors: true });
         console.log(err);
       }
     );
@@ -132,60 +126,39 @@ class EditListener extends React.Component {
     return age;
   }
 
-  handleSubmit(e) {
+  handleListenerSubmit = () => {
+    console.log('test');
     // wipe out any errors/success
-    this.setState({hasError: false, errors: {}, success: false});
+    this.setState({hasErrors: false, errors: [], success: false});
+
+    let errors = [];
 
     // Handle Validation
     let listener = this.state.listener;
 
     if( listener.first_name == '' ) {
-      return this.setState({
-        hasError: true,
-        errors: {
-          "first_name" : "Listeners are required to have a first name.",
-        }
-      });
+      errors.push("Listeners are required to have a first name.");
     }
 
     if( listener.last_name == '' ) {
-      return this.setState({
-        hasError: true,
-        errors: {
-          "last_name" : "Listeners are required to have a last name.",
-        }
-      });
+      errors.push("Listeners are required to have a last name.");
     }
 
     if( listener.email == '' && listener.primary_phone == '' ) {
-      return this.setState({
-        hasError: true,
-        errors: {
-          "primary_phone" : "You must provide a phone number or email address before saving the listener",
-        }
-      });
+      errors.push("You must provide a phone number or email address before saving the listener");
     }
 
     if( listener.date_of_birth == '' ) {
-      return this.setState({
-        hasErrors: true,
-        errors: {
-          "date_of_birth" : "A date of birth is required."
-        }
-      })
+      errors.push("A date of birth is required.");
     }
 
     if( 18 > this.getAge(listener.date_of_birth) ) {
-      return this.setState({
-        hasErrors: true,
-        errors: {
-          "date_of_birth": "Listeners must be 18 or older. Based on the date of birth provided, this listener is only " + this.getAge(listener.date_of_birth)
-        }
-      });
+      errors.push("Listeners must be 18 or older. Based on the date of birth provided, this listener is only " + this.getAge(listener.date_of_birth));
     }
 
-    if( !this.state.hasErrors || this.state.errors.length === 0 ) {
-
+    if( errors.length !== 0 ) {
+      this.setState({ hasErrors: true, errors: errors });
+    } else {
       if( this.state.listenerId == 0 ) {
         this.createListener(listener);
       } else {
@@ -194,16 +167,9 @@ class EditListener extends React.Component {
     }
   }
 
-  getErrorArray(errs) {
-    let err = [];
-    Object.keys(errs).map((err) => {
-      err.push(errs[err]);
-    });
-    return err;
-  }
-
   createListener(data) {
     let self = this;
+    console.log('trying to create a new listener');
 
     MarcoPromo.post(
       'listeners',
@@ -215,7 +181,8 @@ class EditListener extends React.Component {
         });
       }
       ,function (err) {
-        self.setState({ errors: err.response.data.errors, hasError: true });
+        console.log(err);
+        self.setState({ errors: err, hasErrors: true });
         MarcoPromo.error("Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.");
       }
     );
@@ -233,7 +200,8 @@ class EditListener extends React.Component {
         });
       }
       , function( err ) {
-        self.setState({ errors: err.response.data.errors, hasError: true });
+        console.log(err);
+        self.setState({ errors: err.response.data.errors, hasErrors: true });
         MarcoPromo.error("Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.");
       }
     );
@@ -256,7 +224,7 @@ class EditListener extends React.Component {
           </Breadcrumb>
         </div>
         <div>
-          <Form onSubmit={this.handleSubmit}>
+          <Form onSubmit={this.handleListenerSubmit}>
             <Form.Group inline>
               <Form.Field>
                 <Input required value={this.state.listener.first_name} name="first_name" onChange={this.handleChange} placeholder="First Name" />
@@ -310,10 +278,10 @@ class EditListener extends React.Component {
             </Message>
             }
 
-            {this.state.hasError  && this.state.errors.length &&
+            {this.state.hasErrors  && this.state.errors.length &&
             <Message negative>
               <Message.Header>Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.</Message.Header>
-              <Message.List items={this.getErrorArray(errors)}></Message.List>
+              <Message.List items={errors}></Message.List>
             </Message>
             }
 

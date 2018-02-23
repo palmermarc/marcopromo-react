@@ -29,14 +29,14 @@ class EditCopy extends React.Component {
       unsaved: false,
       success: false,
       successMessage: '',
-      errors: {},
+      errors: [],
       hasError: false,
       stations: [],
       copyTypes: [
-        {key: 1,text:'Copy Type 1', value: 1},
-        {key: 2,text:'Copy Type 2', value: 2},
-        {key: 3,text:'Copy Type 3', value: 3},
-        {key: 4,text:'Copy Type 4', value: 4},
+        {text:'Copy Type 1', value: 1},
+        {text:'Copy Type 2', value: 2},
+        {text:'Copy Type 3', value: 3},
+        {text:'Copy Type 4', value: 4},
       ],
       copy : {
         name : '',
@@ -46,38 +46,27 @@ class EditCopy extends React.Component {
         end_date : '',
         type : '',
         station_id : 0,
-        schedule : [{
-          date: '',
-          time: '',
-        }],
       },
+      copySchedule:[{ date: '', time: '' }],
       copyId: 0,
     }
   }
 
-  componentWillMount() {
-    // Call API
-    if( this.state.copyId !== 0 )
-      this.getCopy(this.state.copyId);
+  componentDidMount() {
 
     this.getStations();
-  }
-
-  componentDidMount() {
-    document.title = this.state.niceName;
     if( typeof this.props.match.params.copyId !== "undefined" ) {
-      this.getCopy(this.props.match.params.copyId);
       this.setState({ copyId: this.props.match.params.copyId, niceName: "Update Copy" });
+      this.getCopy(this.props.match.params.copyId);
     }
+
+    document.title = this.state.niceName;
     this.setState({loading: false});
   }
 
   componentWillReceiveProps(nextProps) {
-
-    if (nextProps.route.type !== this.props.route.type) {
-      document.title = this.state.niceName;
-      this.setState(this.getInitialState());
-    }
+    document.title = this.state.niceName;
+    this.setState(this.getInitialState());
   }
 
   handleCopyChange(e) {
@@ -96,7 +85,7 @@ class EditCopy extends React.Component {
   handleSelectChange = (e, {name, value} ) => this.setState({[name]: value, unsaved: true})
 
   handleSubmit = () => {
-    this.setState({ hasError: false, errors: {}, success: false });
+    this.setState({ hasError: false, errors: [], success: false });
     // Handle Validation
 
     let copy = this.state.copy;
@@ -108,9 +97,9 @@ class EditCopy extends React.Component {
       instructions: copy.instructions,
       start_date: copy.start_date,
       end_date: copy.end_date,
-      type: copy.type,
-      station_id: copy.station_id,
-      schedule: copy.copySchedule
+      type: this.state.type,
+      station_id: this.state.station_id,
+      schedule: this.state.copySchedule
     };
 
     if( this.state.copyId !== 0 ) {
@@ -150,10 +139,6 @@ class EditCopy extends React.Component {
       }
       ,function (err) {
         self.setState({ errors: err.response.data.errors, hasError: true });
-        console.log('---------------------------');
-        console.log(err.response.data.errors);
-        console.log('---------------------------');
-        //MarcoPromo.error("Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.");
       }
     );
   }
@@ -170,17 +155,22 @@ class EditCopy extends React.Component {
       function(response) {
         if( response.data.success === true ) {
           let copy = response.data.results;
-          self.setState({
+          let newCopy = {
             name: copy.name,
             content: copy.content,
             instructions: copy.instructions,
             start_date: copy.start_date,
             end_date: copy.end_date,
+          };
+
+          self.setState({
+            copy : newCopy,
+            loading: false,
             type: copy.type,
             station_id: copy.station.ID,
             copySchedule: copy.schedules,
-            loading: false
           });
+
 
           if(copy.schedules.length) {
             self.setState({ visible: true });
@@ -223,7 +213,7 @@ class EditCopy extends React.Component {
 
   handleAddCopySchedule = () => {
     this.setState({
-      copySchedule: this.state.copySchedule.concat([{ name: '' }])
+      copySchedule: this.state.copySchedule.concat([{ date: '', time: '' }])
     });
   }
 
@@ -235,8 +225,8 @@ class EditCopy extends React.Component {
 
   render() {
     const { visible } = this.state;
+    console.log(this.state);
     let errors = this.state.errors;
-    let error_keys = Object.keys(errors);
 
     if(this.state.loading)
       return (
@@ -258,10 +248,6 @@ class EditCopy extends React.Component {
         </div>
         <div>
           <Form onSubmit={this.handleSubmit}>
-            <Form.Field>
-              <Input value={this.state.copyId} name="copyId" type="hidden" />
-            </Form.Field>
-
             <Form.Field required onChange={this.handleCopyChange} name="name" control={Input} label="Copy Title" value={this.state.copy.name} placeholder="Enter the Copy Title" />
             <Form.Field value={this.state.copy.content} required onChange={this.handleCopyChange} name="content" control={TextArea} label="Copy Content" placeholder="Enter the Copy Content" />
 
@@ -270,9 +256,6 @@ class EditCopy extends React.Component {
             <Form.Group inline>
               <Form.Field>
                 <Input required value={this.state.copy.start_date} onChange={this.handleCopyChange} name="start_date" label={{color: "green", tag: false, content: "Start Date"}} type="date" icon="calendar" iconPosition="left" labelPosition="right" />
-                {error_keys.hasOwnProperty('start_date') &&
-                <Message error content={errors.start_date}></Message>
-                }
               </Form.Field>
               <Form.Field>
                 <Input required value={this.state.copy.end_date} onChange={this.handleCopyChange} name="end_date" label={{color: "red", tag: false, content: "End Date"}} type="date" icon="calendar" iconPosition="left" labelPosition="right" />
@@ -281,11 +264,11 @@ class EditCopy extends React.Component {
 
             <Form.Group inline>
               <Form.Field>
-                <Form.Dropdown selection required onChange={this.handleSelectChange} name="station_id" placeholder="Select a Station..." options={this.state.stations} value={this.state.copy.station_id} />
+                <Form.Dropdown selection required onChange={this.handleSelectChange} name="station_id" placeholder="Select a Station..." options={this.state.stations} value={this.state.station_id} />
               </Form.Field>
 
               <Form.Field>
-                <Dropdown selection required onChange={this.handleSelectChange} name="type" placeholder="Select a Copy Type..." options={this.state.copyTypes} value={this.state.copy.type} />
+                <Dropdown selection required onChange={this.handleSelectChange} name="type" placeholder="Select a Copy Type..." options={this.state.copyTypes} value={this.state.type} />
               </Form.Field>
             </Form.Group>
 
@@ -300,7 +283,7 @@ class EditCopy extends React.Component {
 
             <Transition visible={visible} animation='fade' duration={500}>
               <div>
-                {this.state.copy.schedule.map((schedule, idx) => (
+                {this.state.copySchedule.length && this.state.copySchedule.map((schedule, idx) => (
                   <div key={"schedule-"+idx}>
                     <Form.Group className={"repeatable_form_group"}inline>
                       <Form.Field onChange={this.handleCopyScheduleChange(idx, 'date')} control={Input} type="date" icon="calendar" value={schedule.date} />
@@ -320,10 +303,10 @@ class EditCopy extends React.Component {
             </Message>
             }
 
-            {errors.length &&
+            {this.state.hasError && this.state.errors.length &&
             <Message negative>
               <Message.Header>Error saving copy to MarcoPromo API server. Please check your data to make sure all fields are filled out.</Message.Header>
-              <Message.List items={errors}></Message.List>
+              <Message.List items={this.getErrorArray(errors)}></Message.List>
             </Message>
             }
 

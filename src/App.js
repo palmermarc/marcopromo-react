@@ -1,8 +1,12 @@
 import React from 'react';
 import { Router, Route } from 'react-router-dom'
 import { connect } from 'react-redux';
-import Nav from './containers/Nav';
 import createBrowserHistory from 'history/createBrowserHistory';
+import {withRouter} from "react-router";
+import * as actions from "./_actions/actions.authentication";
+import {bindActionCreators} from "redux";
+
+import Nav from './containers/Nav';
 import Login from './containers/Login';
 import CopiesList from './containers/Copies';
 import EditCopy from './containers/EditCopy';
@@ -11,9 +15,7 @@ import EditListener from './containers/EditListener';
 import EditContest from './containers/EditContest';
 
 import LogoutPage from './containers/users/logout';
-import {withRouter} from "react-router";
-import * as actions from "./_actions/actions.authentication";
-import {bindActionCreators} from "redux/index";
+
 
 const history = createBrowserHistory();
 
@@ -23,13 +25,22 @@ class App extends React.Component {
     super(props, context);
   }
 
+  componentWillMount() {
+    let token = sessionStorage.getItem("marcoPromoToken");
+
+    if ( token !== null ) {
+      console.log('We need to check the token...');
+      this.props.actions.checkToken(token);
+    } else {
+      history.push('/login/');
+    }
+  }
 
 
   render() {
     return (
       <div className={"marcopromo-app-container " + ( this.props.user.isLoggedIn ? "user-logged-in" : "user-not-logged-in" ) }>
         <Router history={history}>
-          <div>
               <div id="" className="content">
                 <Nav></Nav>
                 <div id="content_bin">
@@ -45,16 +56,16 @@ class App extends React.Component {
                   <Route exact path="/contests/create/" component={EditContest} />
                 </div>
               </div>
-          </div>
         </Router>
       </div>
     )
   }
 }
 
-const mapStateToProps = (state) => {
+function mapStateToProps(state) {
   return state;
-};
+}
+
 
 function mapDispatchToProps(dispatch) {
   return {
@@ -62,7 +73,7 @@ function mapDispatchToProps(dispatch) {
   };
 }
 
-export default withRouter(connect(
+export default connect(
   mapStateToProps,
   mapDispatchToProps
-)(App));
+)(App);

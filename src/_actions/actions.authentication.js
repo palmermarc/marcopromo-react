@@ -1,4 +1,8 @@
 import axios from 'axios';
+import createHistory from 'history/createBrowserHistory';
+import MarcoPromo from '../core/MarcoPromo';
+
+const history = createHistory();
 
 function authLogout() {
   return {
@@ -28,7 +32,6 @@ export function authHasErrors(error) {
 }
 
 export function authenticateUser(username, password){
-  console.log('Made it to the function');
   let loginData = {
     username: username,
     password: password
@@ -36,7 +39,7 @@ export function authenticateUser(username, password){
 
   return (dispatch) => {
     return axios.post('//marcopromo.api/users/authenticate', loginData ).then((response) => {
-      dispatch(authLogin(response.data.id));
+      sessionStorage.setItem('marcoPromoToken', response.data.token);
       sessionStorage.setItem('user', response.data);
       sessionStorage.setItem('userId', response.data.id);
       sessionStorage.setItem('username', response.data.username);
@@ -44,11 +47,11 @@ export function authenticateUser(username, password){
       sessionStorage.setItem('last_name', response.data.last_name);
       sessionStorage.setItem('email', response.data.email);
       sessionStorage.setItem('phone', response.data.phone);
-      sessionStorage.setItem('marcoPromoToken', response.data.token);
+      dispatch(authLogin(response.data.id));
     }).catch((e) => {
+      console.log(e);
       let response = JSON.parse(e.response.request.response);
       dispatch(authHasErrors("Error: Wrong Username/Password"));
-      sessionStorage.setItem('error', response.message);
     });
   }
 }
@@ -61,35 +64,31 @@ export function userLogOut() {
   }
 }
 
-export function checkToken(token) {
-  console.log(token);
-  console.log(this.context.router);
-  /*return function (dispatch) {
-    // thunk
+export function checkToken() {
 
-    let url = '//marcopromo.api/token/authenticate'
+  return function (dispatch) {
 
-    axios.post(url, {token}).then(function (response) {
-      if (response.data.success === true) {
+    let url = 'users/validate';
 
-        return dispatch({
-          type: types.VALID_TOKEN,
-          token: response.data.token,
-          accessLevel: response.data.accessLevel,
-          userId: response.data.userId,
-          username: response.data.username,
-          userFirstName: response.data.first_name,
-          userLastName: response.data.last_name,
-          userPhoto: response.data.photo,
-          userRole: response.data.role,
-          userMarket: response.data.market
-        });
+    MarcoPromo.get(url, {}, function (response) {
+      if( response.data.status === 'success' ) {
+        sessionStorage.setItem('userId', response.data.id);
+        sessionStorage.setItem('username', response.data.username);
+        sessionStorage.setItem('first_name', response.data.first_name);
+        sessionStorage.setItem('last_name', response.data.last_name);
+        sessionStorage.setItem('email', response.data.email);
+        sessionStorage.setItem('phone', response.data.phone);
+        dispatch(authLogin(response.data.id));
       } else {
-        browserHistory.push('/login/');
+        dispatch(authHasErrors(response.data.message));
+        dispatch(userLogOut());
+        history.push('/login/');
       }
-    }).catch(function() {
-      browserHistory.push('/login');
+    },function(e) {
+      dispatch(authHasErrors(e.response.data.message));
+      dispatch(userLogOut());
+      history.push('/login/');
     });
   };
-  */
+
 }

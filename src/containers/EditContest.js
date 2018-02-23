@@ -256,3 +256,10 @@ export default withRouter(connect(
   mapStateToProps,
   mapDispatchToProps
 )(EditContest));
+
+/*
+SELECT COUNT(ID) FROM wp_posts WHERE post_type = 'copy';
+SELECT COUNT(ID) FROM wp_posts WHERE post_type = 'copy' AND post_content = '';
+SELECT COUNT(ID) FROM wp_posts WHERE ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = 'copy_type' AND meta_value = 'contest') AND post_type = 'copy';
+SELECT COUNT(ID) FROM wp_posts WHERE ID IN (SELECT post_id FROM wp_postmeta WHERE meta_key = 'copy_type' AND meta_value = 'contest') AND post_type = 'copy' AND post_content = '';
+ */

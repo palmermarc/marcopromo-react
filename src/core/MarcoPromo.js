@@ -20,7 +20,7 @@ class MarcoPromo {
 
     let url = this.config.apiBase + endpoint + ( query !== {} ? '?' + queryString.stringify(query) : '' );
     let config = {
-      //headers: {"X-MarcoPromo-Token" : localStorage.getItem("marcoPromoToken")}
+      headers: {"Authorization" : "Bearer " + sessionStorage.getItem("marcoPromoToken")},
     };
     console.log(url);
 
@@ -60,8 +60,8 @@ class MarcoPromo {
     
     let url = this.config.apiBase + endpoint;
     let config = {
-      //headers: {"X-MarcoPromo-Token" : localStorage.getItem("marcoPromoToken")},
-      ...data
+      headers: {"Authorization" : "Bearer " + sessionStorage.getItem("marcoPromoToken")},
+      data: data
     };
 
     let result = new Promise(resolve => {
@@ -102,7 +102,7 @@ class MarcoPromo {
 
     let url = this.config.apiBase + endpoint;
     let config = {
-      //headers: {"X-MarcoPromo-Token" : localStorage.getItem("marcoPromoToken")},
+      headers: {"Authorization" : "Bearer " + sessionStorage.getItem("marcoPromoToken")},
       ...data
     };
 
